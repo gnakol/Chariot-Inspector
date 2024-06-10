@@ -4,6 +4,7 @@ import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
+import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapper;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapperImpl;
 import fr_scapartois_auto.chariot_inspector.role.repositories.RoleRepository;
@@ -19,7 +20,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -77,6 +80,15 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                             if (a.getPickUpDateTime() != null)
                                 a.setPickUpDateTime(e.getPickUpDateTime());
 
+                            if (a.getRoles() != null)
+                            {
+                                List<Role> roles = e.getRoleDTOS().stream().map(this.roleMapper::fromRoleDTO).collect(Collectors.toList());
+
+                                a.setRoles(roles);
+                            }
+
+
+
                             return this.accountRepository.save(a);
                         })
                         .orElseThrow(() -> new RuntimeException("Account with id: " +id+ " not found"))
@@ -90,7 +102,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     @Override
     public Optional<AccountDTO> getById(Long id) {
-        return Optional.empty();
+        return this.accountRepository.findById(id)
+                .map(this.accountMapper::fromAccount);
     }
 
     @Override
