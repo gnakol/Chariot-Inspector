@@ -41,9 +41,4 @@ public class AuthController {
         }
         return null;
     }
-
-    @PostMapping(path = "add-new-account", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AccountDTO> addAccount(@Validated @RequestBody AccountDTO accountDTO) throws NoSuchAlgorithmException {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.accountService.addNewAccount(accountDTO));
-    }
 }

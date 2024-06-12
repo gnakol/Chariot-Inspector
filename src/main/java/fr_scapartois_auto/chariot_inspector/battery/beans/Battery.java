@@ -1,5 +1,8 @@
 package fr_scapartois_auto.chariot_inspector.battery.beans;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,4 +33,10 @@ public class Battery {
 
     @Column(name = "state")
     private String state;
+
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "id_cart")
+    @JsonIgnoreProperties({"cart"})
+    @JsonBackReference
+    private Cart cart;
 }

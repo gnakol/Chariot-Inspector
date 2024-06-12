@@ -1,9 +1,13 @@
 package fr_scapartois_auto.chariot_inspector.account.services;
 
+import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
+import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
+import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
+import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapper;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapperImpl;
@@ -42,6 +46,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     private final RoleService roleService;
 
+    private final CartMapper cartMapper = new CartMapperImpl();
+
     @Override
     public Page<AccountDTO> all(Pageable pageable) {
         return this.accountRepository.findAll(pageable)
@@ -71,6 +77,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setName(e.getName());
                             if (a.getFirstName() != null)
                                 a.setFirstName(e.getFirstName());
+                            if (a.getEmail() != null)
+                                a.setEmail(e.getEmail());
                             if (a.getPassword() != null)
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
                             if (a.getService() != null)
@@ -87,6 +95,13 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setRoles(roles);
                             }
 
+                            if (a.getCart() != null)
+                            {
+                                Cart cart = this.cartMapper.fromCartDTO(e.getCartDTO());
+
+                                a.setCart(cart);
+                            }
+
 
 
                             return this.accountRepository.save(a);
@@ -97,6 +112,15 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     @Override
     public void remove(Long id) {
+
+        Optional<Account> account = this.accountRepository.findById(id);
+
+        if (account.isEmpty())
+        {
+            throw new RuntimeException("account with id :" +id+ "was not found");
+        }
+
+        this.accountRepository.delete(account.get());
 
     }
 

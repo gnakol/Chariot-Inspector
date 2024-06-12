@@ -1,7 +1,9 @@
 package fr_scapartois_auto.chariot_inspector.cart.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fr_scapartois_auto.chariot_inspector.accompanied.beans.Accompanied;
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
+import fr_scapartois_auto.chariot_inspector.battery.beans.Battery;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,4 +73,11 @@ public class Cart {
     @OneToMany(mappedBy = "cart")
     @JsonIgnoreProperties({"cart"})
     private List<Account> accounts;
+
+    @OneToMany(mappedBy = "cart")
+    @JsonIgnoreProperties({"cart"})
+    private List<Battery> batteryList;
+
+    @OneToMany(mappedBy = "cart")
+    private List<Accompanied> accompanieds;
 }
