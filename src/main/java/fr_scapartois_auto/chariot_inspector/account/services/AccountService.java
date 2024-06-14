@@ -6,8 +6,10 @@ import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
+import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
+import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapper;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapperImpl;
@@ -16,6 +18,7 @@ import fr_scapartois_auto.chariot_inspector.role.services.RoleService;
 import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AccountService implements Webservices<AccountDTO>, UserDetailsService {
 
     private final AccountRepository accountRepository;
@@ -47,6 +51,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
     private final RoleService roleService;
 
     private final CartMapper cartMapper = new CartMapperImpl();
+
+    private final CartRepository cartRepository;
 
     @Override
     public Page<AccountDTO> all(Pageable pageable) {
@@ -70,45 +76,55 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     @Override
     public AccountDTO update(Long id, AccountDTO e) {
+        if (id == null) {
+            throw new IllegalArgumentException("The given id must not be null");
+        }
+
         return this.accountMapper.fromAccount(
                 this.accountRepository.findById(id)
                         .map(a -> {
-                            if (a.getName() != null)
+                            a.setRefAccount(this.uuidService.generateUuid());
+                            if (e.getName() != null)
                                 a.setName(e.getName());
-                            if (a.getFirstName() != null)
+                            if (e.getFirstName() != null)
                                 a.setFirstName(e.getFirstName());
-                            if (a.getEmail() != null)
+                            if (e.getEmail() != null)
                                 a.setEmail(e.getEmail());
-                            if (a.getPassword() != null)
+                            if (e.getPassword() != null)
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
-                            if (a.getService() != null)
+                            if (e.getService() != null)
                                 a.setService(e.getService());
-                            if (a.getTaurusNumber() != null)
+                            if (e.getTaurusNumber() != null)
                                 a.setTaurusNumber(e.getTaurusNumber());
-                            if (a.getPickUpDateTime() != null)
+                            if (e.getPickUpDateTime() != null)
                                 a.setPickUpDateTime(e.getPickUpDateTime());
 
-                            if (a.getRoles() != null)
-                            {
-                                List<Role> roles = e.getRoleDTOS().stream().map(this.roleMapper::fromRoleDTO).collect(Collectors.toList());
-
+                            if (e.getRoleDTOS() != null) {
+                                List<Role> roles = e.getRoleDTOS().stream()
+                                        .map(this.roleMapper::fromRoleDTO)
+                                        .collect(Collectors.toList());
                                 a.setRoles(roles);
                             }
 
-                            if (a.getCart() != null)
-                            {
-                                Cart cart = this.cartMapper.fromCartDTO(e.getCartDTO());
-
-                                a.setCart(cart);
+                            if (e.getCartDTO() != null) {
+                                CartDTO cartDTO = e.getCartDTO();
+                                if (cartDTO.getIdCart() != null) {
+                                    Cart cart = this.cartRepository.findById(cartDTO.getIdCart())
+                                            .orElseThrow(() -> new RuntimeException("Cart with id: " + cartDTO.getIdCart() + " not found"));
+                                    a.setCart(cart);
+                                } else {
+                                    throw new IllegalArgumentException("Cart id must not be null");
+                                }
                             }
-
-
 
                             return this.accountRepository.save(a);
                         })
-                        .orElseThrow(() -> new RuntimeException("Account with id: " +id+ " not found"))
+                        .orElseThrow(() -> new RuntimeException("Account with id: " + id + " not found"))
         );
     }
+
+
+
 
     @Override
     public void remove(Long id) {

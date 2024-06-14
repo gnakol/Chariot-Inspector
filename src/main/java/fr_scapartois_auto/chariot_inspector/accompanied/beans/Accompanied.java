@@ -20,7 +20,7 @@ public class Accompanied {
     @EmbeddedId
     private AccompaniedKey idAccompanied;
 
-    @ManyToOne(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @MapsId("idCart")
     @JoinColumn(name = "id_cart", insertable = false, updatable = false)
     private Cart cart;

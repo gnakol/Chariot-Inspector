@@ -3,6 +3,7 @@ package fr_scapartois_auto.chariot_inspector.account.beans;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
+import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -59,7 +60,7 @@ public class Account implements UserDetails {
     @JoinTable(name = "role_account",
             joinColumns = @JoinColumn(name = "id_account"),
             inverseJoinColumns = @JoinColumn(name = "id_role"))
-    List<Role> roles;
+    List<Role> roles = new ArrayList<>();
 
 
     @ManyToOne(cascade = CascadeType.MERGE)
@@ -67,6 +68,9 @@ public class Account implements UserDetails {
     @JsonIgnoreProperties({"accounts"})
     @JsonBackReference
     private Cart cart;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Issue> issues;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
