@@ -1,5 +1,8 @@
 package fr_scapartois_auto.chariot_inspector.action_carried_out.beans;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fr_scapartois_auto.chariot_inspector.account.beans.Account;
+import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +24,14 @@ public class ActionCarriedOut {
 
     @Column(name = "description")
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "id_issue", nullable = false)
+    @JsonIgnoreProperties({"actionCarriedOuts"})
+    private Issue issue;
+
+    @ManyToOne
+    @JoinColumn(name = "id_account", nullable = true)
+    @JsonIgnoreProperties({"actionCarriedOuts", "roles", "password", "cart"})
+    private Account account;
 }

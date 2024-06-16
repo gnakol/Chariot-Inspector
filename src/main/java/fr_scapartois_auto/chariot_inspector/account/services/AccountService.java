@@ -92,8 +92,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setEmail(e.getEmail());
                             if (e.getPassword() != null)
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
-                            if (e.getService() != null)
-                                a.setService(e.getService());
+                            if (e.getService() != null)                                a.setService(e.getService());
                             if (e.getTaurusNumber() != null)
                                 a.setTaurusNumber(e.getTaurusNumber());
                             if (e.getPickUpDateTime() != null)
@@ -150,5 +149,12 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return this.accountRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public Long getAccountIdByEmail(String email)
+    {
+        Account account = this.accountRepository.findByEmail(email).get();
+
+        return account.getIdAccount();
     }
 }

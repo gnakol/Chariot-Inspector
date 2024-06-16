@@ -2,6 +2,7 @@ package fr_scapartois_auto.chariot_inspector.account.beans;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fr_scapartois_auto.chariot_inspector.action_carried_out.beans.ActionCarriedOut;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
@@ -55,6 +56,7 @@ public class Account implements UserDetails {
     @Column(name = "pick_up_date_time")
     private Date pickUpDateTime;
 
+
     @ManyToMany(fetch = FetchType.EAGER)
     @Column(name = "id_role", nullable = false)
     @JoinTable(name = "role_account",
@@ -70,7 +72,12 @@ public class Account implements UserDetails {
     private Cart cart;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"account"})
     private List<Issue> issues;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties({"account", "issue"})
+    private List<ActionCarriedOut> actionCarriedOuts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -67,4 +67,11 @@ public class AccountController {
 
         return ResponseEntity.status(202).body("Account id : "+idAccount+ "was successfully remove");
     }
+
+    @GetMapping("get-user-id-by-email")
+    public ResponseEntity<Long> getUserIdByEmail(@RequestParam String email) {
+        Long userId = accountService.getAccountIdByEmail(email); // Implémentez cette méthode dans votre service
+        return ResponseEntity.ok(userId);
+    }
+
 }
