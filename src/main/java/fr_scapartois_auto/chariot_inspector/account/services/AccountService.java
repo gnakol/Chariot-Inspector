@@ -92,11 +92,19 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setEmail(e.getEmail());
                             if (e.getPassword() != null)
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
-                            if (e.getService() != null)                                a.setService(e.getService());
+                            if (e.getService() != null)
+                                a.setService(e.getService());
+
+                            // Réinitialiser les champs optionnels si null
                             if (e.getTaurusNumber() != null)
                                 a.setTaurusNumber(e.getTaurusNumber());
+                            else
+                                a.setTaurusNumber(null);
+
                             if (e.getPickUpDateTime() != null)
                                 a.setPickUpDateTime(e.getPickUpDateTime());
+                            else
+                                a.setPickUpDateTime(null);
 
                             if (e.getRoleDTOS() != null) {
                                 List<Role> roles = e.getRoleDTOS().stream()
@@ -105,7 +113,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setRoles(roles);
                             }
 
-                            if (e.getCartDTO() != null) {
+                            if (e.getCartDTO() != null && e.getRoleDTOS().stream().anyMatch(roleDTO -> "RECEPTIONNAIRE".equals(roleDTO.getRoleName()))) {
                                 CartDTO cartDTO = e.getCartDTO();
                                 if (cartDTO.getIdCart() != null) {
                                     Cart cart = this.cartRepository.findById(cartDTO.getIdCart())
@@ -114,6 +122,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 } else {
                                     throw new IllegalArgumentException("Cart id must not be null");
                                 }
+                            } else {
+                                a.setCart(null); // Réinitialiser si cartDTO est null ou si le rôle ne correspond pas
                             }
 
                             return this.accountRepository.save(a);
@@ -121,6 +131,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                         .orElseThrow(() -> new RuntimeException("Account with id: " + id + " not found"))
         );
     }
+
 
 
 

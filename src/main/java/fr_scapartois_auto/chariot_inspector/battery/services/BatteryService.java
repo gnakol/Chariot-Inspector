@@ -6,6 +6,7 @@ import fr_scapartois_auto.chariot_inspector.battery.mappers.BatteryMapper;
 import fr_scapartois_auto.chariot_inspector.battery.mappers.BatteryMapperImpl;
 import fr_scapartois_auto.chariot_inspector.battery.repositories.BatteryRepository;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
+import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
@@ -42,6 +43,13 @@ public class BatteryService implements Webservices<BatteryDTO> {
     public BatteryDTO add(BatteryDTO e) {
 
         e.setRefBattery(this.uuidService.generateUuid());
+
+        CartDTO cartDTO = e.getCartDTO();
+
+        Cart cart = this.cartRepository.findById(this.cartMapper.fromCartDTO(cartDTO).getIdCart())
+                .orElseThrow(() -> new RuntimeException("id cart was not found"));
+        
+        e.setCartDTO(this.cartMapper.fromCart(cart));
 
         return this.batteryMapper.fromBattery(this.batteryRepository.save(this.batteryMapper.fromBatteryDTO(e)));
     }
