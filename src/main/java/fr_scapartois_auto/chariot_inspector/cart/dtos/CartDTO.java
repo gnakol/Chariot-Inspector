@@ -17,8 +17,7 @@ import java.util.List;
 public class CartDTO {
 
     private Long idCart;
-    private String refCart;
-    private Long cartNumber;
+    private String cartNumber;
     private String conditionChassis;
     private String wheelsTornPlat;
     private String batteryCablesSockets;
@@ -32,8 +31,6 @@ public class CartDTO {
     private String noLeak;
     private String antiCrushButton;
     private String conditionForks;
-
-    private List<AccountDTO> accountDTOS;
 
     private List<BatteryDTO> batteryDTOS;
 

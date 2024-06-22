@@ -25,11 +25,8 @@ public class Cart {
     @Column(name = "id_cart")
     private Long idCart;
 
-    @Column(name = "ref_cart")
-    private String refCart;
-
     @Column(name = "cart_number")
-    private Long cartNumber;
+    private String cartNumber;
 
     @Column(name = "condition_chassis")
     private String conditionChassis;
@@ -69,10 +66,6 @@ public class Cart {
 
     @Column(name = "condition_forks")
     private String conditionForks;
-
-    @OneToMany(mappedBy = "cart")
-    @JsonIgnoreProperties({"cart"})
-    private List<Account> accounts;
 
     @OneToMany(mappedBy = "cart")
     @JsonIgnoreProperties({"cart"})

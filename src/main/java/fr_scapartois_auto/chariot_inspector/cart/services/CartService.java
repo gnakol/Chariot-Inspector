@@ -42,8 +42,6 @@ public class CartService implements Webservices<CartDTO> {
     @Override
     public CartDTO add(CartDTO e) {
 
-        e.setRefCart(this.uuidService.generateUuid());
-
         return this.cartMapper.fromCart(this.cartRepository.save(this.cartMapper.fromCartDTO(e)));
     }
 
@@ -80,13 +78,6 @@ public class CartService implements Webservices<CartDTO> {
                     if (cart.getConditionForks() != null)
                         cart.setConditionForks(e.getConditionForks());
 
-                    if (e.getAccountDTOS() != null)
-                    {
-                        List<Account> accounts = e.getAccountDTOS().stream().map(this.accountMapper::fromAccountDTO).collect(Collectors.toList());
-
-                        cart.setAccounts(accounts);
-                    }
-
                     return this.cartRepository.save(cart);
                 })
                 .orElseThrow(() -> new RuntimeException("cart with id " +id+ " was not found")));
@@ -111,4 +102,10 @@ public class CartService implements Webservices<CartDTO> {
         return this.cartRepository.findById(id)
                 .map(this.cartMapper::fromCart);
     }
+
+    public CartDTO getLastCart() {
+        Cart lastCart = cartRepository.findTopByOrderByIdCartDesc(); // Assurez-vous que cette méthode existe dans le repository
+        return cartMapper.fromCart(lastCart);
+    }
+
 }

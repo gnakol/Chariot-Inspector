@@ -67,7 +67,6 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     public AccountDTO addNewAccount(AccountDTO accountDTO)
     {
-        accountDTO.setRefAccount(this.uuidService.generateUuid());
         accountDTO.setPassword(this.bCryptPasswordEncoder.encode(accountDTO.getPassword()));
         accountDTO.setRoleDTOS(this.roleService.getDefaultRoles());
 
@@ -83,7 +82,6 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
         return this.accountMapper.fromAccount(
                 this.accountRepository.findById(id)
                         .map(a -> {
-                            a.setRefAccount(this.uuidService.generateUuid());
                             if (e.getName() != null)
                                 a.setName(e.getName());
                             if (e.getFirstName() != null)
@@ -95,35 +93,11 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                             if (e.getService() != null)
                                 a.setService(e.getService());
 
-                            // Réinitialiser les champs optionnels si null
-                            if (e.getTaurusNumber() != null)
-                                a.setTaurusNumber(e.getTaurusNumber());
-                            else
-                                a.setTaurusNumber(null);
-
-                            if (e.getPickUpDateTime() != null)
-                                a.setPickUpDateTime(e.getPickUpDateTime());
-                            else
-                                a.setPickUpDateTime(null);
-
                             if (e.getRoleDTOS() != null) {
                                 List<Role> roles = e.getRoleDTOS().stream()
                                         .map(this.roleMapper::fromRoleDTO)
                                         .collect(Collectors.toList());
                                 a.setRoles(roles);
-                            }
-
-                            if (e.getCartDTO() != null && e.getRoleDTOS().stream().anyMatch(roleDTO -> "RECEPTIONNAIRE".equals(roleDTO.getRoleName()))) {
-                                CartDTO cartDTO = e.getCartDTO();
-                                if (cartDTO.getIdCart() != null) {
-                                    Cart cart = this.cartRepository.findById(cartDTO.getIdCart())
-                                            .orElseThrow(() -> new RuntimeException("Cart with id: " + cartDTO.getIdCart() + " not found"));
-                                    a.setCart(cart);
-                                } else {
-                                    throw new IllegalArgumentException("Cart id must not be null");
-                                }
-                            } else {
-                                a.setCart(null); // Réinitialiser si cartDTO est null ou si le rôle ne correspond pas
                             }
 
                             return this.accountRepository.save(a);

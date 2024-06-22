@@ -59,6 +59,13 @@ public class CartController {
                 });
     }
 
+    @GetMapping("/last-cart")
+    public ResponseEntity<CartDTO> getLastCart() {
+        CartDTO lastCart = cartService.getLastCart();
+        return ResponseEntity.ok(lastCart);
+    }
+
+
 
 
 

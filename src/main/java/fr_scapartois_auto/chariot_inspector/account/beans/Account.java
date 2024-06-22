@@ -6,6 +6,7 @@ import fr_scapartois_auto.chariot_inspector.action_carried_out.beans.ActionCarri
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
+import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,10 +30,7 @@ public class Account implements UserDetails {
     @Column(name = "id_account")
     private Long idAccount;
 
-    @Column(name = "ref_account")
-    private String refAccount;
-
-    @Column(name = "name_")
+    @Column(name = "name")
     private String name;
 
     @Column(name = "first_name")
@@ -50,11 +48,6 @@ public class Account implements UserDetails {
     @Column(name = "civility")
     private String civility;
 
-    @Column(name = "taurus_number")
-    private Long taurusNumber;
-
-    @Column(name = "pick_up_date_time")
-    private Date pickUpDateTime;
 
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -64,13 +57,6 @@ public class Account implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "id_role"))
     List<Role> roles = new ArrayList<>();
 
-
-    @ManyToOne(cascade = CascadeType.MERGE)
-    @JoinColumn(name = "id_cart")
-    @JsonIgnoreProperties({"accounts"})
-    @JsonBackReference
-    private Cart cart;
-
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"account"})
     private List<Issue> issues;
@@ -78,6 +64,10 @@ public class Account implements UserDetails {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties({"account", "issue"})
     private List<ActionCarriedOut> actionCarriedOuts;
+
+    @OneToMany(mappedBy = "account")
+    //@JsonIgnoreProperties({"account", "taurus"})
+    private List<TaurusUsage> taurusUsages;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

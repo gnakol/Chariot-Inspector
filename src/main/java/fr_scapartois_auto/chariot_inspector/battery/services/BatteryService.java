@@ -45,14 +45,18 @@ public class BatteryService implements Webservices<BatteryDTO> {
         e.setRefBattery(this.uuidService.generateUuid());
 
         CartDTO cartDTO = e.getCartDTO();
+        if (cartDTO == null || cartDTO.getIdCart() == null) {
+            throw new RuntimeException("Cart ID is missing");
+        }
 
-        Cart cart = this.cartRepository.findById(this.cartMapper.fromCartDTO(cartDTO).getIdCart())
+        Cart cart = this.cartRepository.findById(cartDTO.getIdCart())
                 .orElseThrow(() -> new RuntimeException("id cart was not found"));
-        
+
         e.setCartDTO(this.cartMapper.fromCart(cart));
 
         return this.batteryMapper.fromBattery(this.batteryRepository.save(this.batteryMapper.fromBatteryDTO(e)));
     }
+
 
     @Override
     public BatteryDTO update(Long id, BatteryDTO e) {

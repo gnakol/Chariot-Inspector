@@ -16,6 +16,15 @@ services:
     networks:
       - chariot_inspector_network
 
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - chariot_inspector_network
+
 volumes:
   mysql_data:
 
