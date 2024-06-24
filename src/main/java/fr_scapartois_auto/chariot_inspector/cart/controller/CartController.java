@@ -65,6 +65,14 @@ public class CartController {
         return ResponseEntity.ok(lastCart);
     }
 
+    @GetMapping("get-id-cart-by-number")
+    public ResponseEntity<Long> getIdCartByNumber(@Validated @RequestParam String cartNumber)
+    {
+        Long idCart = this.cartService.getIdCartByNum(cartNumber);
+
+        return ResponseEntity.ok(idCart);
+    }
+
 
 
 

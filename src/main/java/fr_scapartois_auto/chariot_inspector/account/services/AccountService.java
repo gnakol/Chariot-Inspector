@@ -5,8 +5,6 @@ import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
-import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
-import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
@@ -15,7 +13,6 @@ import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapper;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapperImpl;
 import fr_scapartois_auto.chariot_inspector.role.repositories.RoleRepository;
 import fr_scapartois_auto.chariot_inspector.role.services.RoleService;
-import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +36,6 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
     private final AccountRepository accountRepository;
 
     private final  AccountMapper accountMapper = new AccountMapperImpl();
-
-    private final UuidService uuidService;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 

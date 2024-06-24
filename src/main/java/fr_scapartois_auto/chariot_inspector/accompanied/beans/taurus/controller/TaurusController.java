@@ -30,4 +30,26 @@ public class TaurusController {
     {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.taurusService.add(taurusDTO));
     }
+
+    @GetMapping("get-taurus-by-id/{idTaurus}")
+    public ResponseEntity<TaurusDTO> getTaurusById(@Validated @PathVariable Long idTaurus)
+    {
+        return this.taurusService.getById(idTaurus)
+                .map(taurusDTO -> {
+                    log.info("taurus with id : " +idTaurus+ " was found");
+                    return new ResponseEntity<>(taurusDTO, HttpStatus.OK);
+                })
+                .orElseThrow(() ->{
+                    log.error("taurus with id : " +idTaurus+ " was not found");
+                    return new RuntimeException("sorry this taurus was not found");
+                });
+    }
+
+    @GetMapping("get-id-taurus-by-number/{taurusNumber}")
+    public ResponseEntity<Long> getIdTaurusByNumber(@Validated @PathVariable Long taurusNumber)
+    {
+        Long idTaurus = this.taurusService.getTaurusIdByNumber(taurusNumber);
+
+        return ResponseEntity.ok(idTaurus);
+    }
 }

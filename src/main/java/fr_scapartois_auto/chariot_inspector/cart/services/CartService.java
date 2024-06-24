@@ -108,4 +108,14 @@ public class CartService implements Webservices<CartDTO> {
         return cartMapper.fromCart(lastCart);
     }
 
+    public Long getIdCartByNum(String cartNumber)
+    {
+        Optional<Cart> cart = this.cartRepository.findByCartNumber(cartNumber);
+
+        if (cart.isEmpty())
+            throw new RuntimeException("Cart loss was not found");
+
+        return cart.get().getIdCart();
+    }
+
 }

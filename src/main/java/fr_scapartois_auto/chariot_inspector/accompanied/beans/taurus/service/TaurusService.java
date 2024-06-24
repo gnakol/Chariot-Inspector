@@ -68,4 +68,16 @@ public class TaurusService implements Webservices<TaurusDTO> {
         return this.taurusRepository.findById(id)
                 .map(this.taurusMapper::fromTaurus);
     }
+
+    public Long getTaurusIdByNumber(Long number)
+    {
+        Optional<Taurus> taurus = this.taurusRepository.findByTaurusNumber(number);
+
+        if (taurus.isEmpty())
+        {
+            throw new RuntimeException("taurus with number : " +number+ " was not found");
+        }
+
+        return taurus.get().getIdTaurus();
+    }
 }
