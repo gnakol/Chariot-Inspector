@@ -58,4 +58,12 @@ public class BatteryController {
                     throw new RuntimeException("Error find battery");
                 });
     }
+
+    @GetMapping("get-id-battery-by-number/{batteryNumber}")
+    public ResponseEntity<Long> getIdBatteryByNumber(@Validated @PathVariable Long batteryNumber)
+    {
+        Long idBattery = this.batteryService.getIdBatteryByNum(batteryNumber);
+
+        return ResponseEntity.ok(idBattery);
+    }
 }

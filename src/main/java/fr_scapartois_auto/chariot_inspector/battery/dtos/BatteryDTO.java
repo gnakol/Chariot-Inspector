@@ -18,5 +18,5 @@ public class BatteryDTO {
     private Long chargeLevel;
     private String state;
 
-    private CartDTO cartDTO;
+    private Long idCart;
 }

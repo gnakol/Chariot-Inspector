@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface BatteryRepository extends JpaRepository<Battery, Long> {
 
     Optional<Battery> findByBatteryNumber(Long batteryNumber);
+
 }

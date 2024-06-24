@@ -2,16 +2,15 @@ package fr_scapartois_auto.chariot_inspector.battery.mappers;
 
 import fr_scapartois_auto.chariot_inspector.battery.beans.Battery;
 import fr_scapartois_auto.chariot_inspector.battery.dtos.BatteryDTO;
-import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "default", uses = {CartMapper.class})
+@Mapper(componentModel = "default")
 public interface BatteryMapper {
 
-    @Mapping(target = "cartDTO", source = "cart")
+    @Mapping(target = "idCart", source = "cart.idCart")
     BatteryDTO fromBattery(Battery battery);
 
-    @Mapping(target = "cart", source = "cartDTO")
+    @Mapping(target = "cart.idCart", source = "idCart")
     Battery fromBatteryDTO(BatteryDTO batteryDTO);
 }

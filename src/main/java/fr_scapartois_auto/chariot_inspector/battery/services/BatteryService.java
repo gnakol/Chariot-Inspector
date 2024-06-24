@@ -44,17 +44,20 @@ public class BatteryService implements Webservices<BatteryDTO> {
 
         e.setRefBattery(this.uuidService.generateUuid());
 
-        CartDTO cartDTO = e.getCartDTO();
-        if (cartDTO == null || cartDTO.getIdCart() == null) {
-            throw new RuntimeException("Cart ID is missing");
+        Battery battery = this.batteryMapper.fromBatteryDTO(e);
+
+        Optional<Cart> cart = this.cartRepository.findById(battery.getCart().getIdCart());
+
+        if (cart.isPresent())
+        {
+            battery.setCart(cart.get());
+
+            Battery savedBattery = this.batteryRepository.save(battery);
+
+            return this.batteryMapper.fromBattery(savedBattery);
         }
-
-        Cart cart = this.cartRepository.findById(cartDTO.getIdCart())
-                .orElseThrow(() -> new RuntimeException("id cart was not found"));
-
-        e.setCartDTO(this.cartMapper.fromCart(cart));
-
-        return this.batteryMapper.fromBattery(this.batteryRepository.save(this.batteryMapper.fromBatteryDTO(e)));
+        else
+            throw new RuntimeException("Cart not found");
     }
 
 
@@ -69,12 +72,10 @@ public class BatteryService implements Webservices<BatteryDTO> {
                     if (e.getState() != null)
                         battery.setState(e.getState());
 
-                    if (e.getCartDTO() != null && e.getCartDTO().getIdCart() != null) {
-                        Cart cart = this.cartRepository.findById(e.getCartDTO().getIdCart())
-                                .orElseThrow(() -> new RuntimeException("Cart with id : " + e.getCartDTO().getIdCart() + " was not found"));
-                        battery.setCart(cart);
-                    } else {
-                        battery.setCart(null);
+                    if (e.getIdCart() != null)
+                    {
+                        Optional<Cart> cart = this.cartRepository.findById(e.getIdCart());
+                        battery.setCart(cart.get());
                     }
 
                     return this.batteryRepository.save(battery);
@@ -101,5 +102,15 @@ public class BatteryService implements Webservices<BatteryDTO> {
     public Optional<BatteryDTO> getById(Long id) {
         return this.batteryRepository.findById(id)
                 .map(this.batteryMapper::fromBattery);
+    }
+
+    public Long getIdBatteryByNum(Long batteryNumber)
+    {
+        Optional<Battery> battery = this.batteryRepository.findByBatteryNumber(batteryNumber);
+
+        if (battery.isEmpty())
+            throw new RuntimeException("number of battery with : "+batteryNumber+ " was not found");
+
+        return battery.get().getIdBattery();
     }
 }
