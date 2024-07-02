@@ -1,5 +1,7 @@
 package fr_scapartois_auto.chariot_inspector.account.dtos;
 
+import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
+import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.role.dtos.RoleDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import lombok.AllArgsConstructor;
@@ -26,5 +28,9 @@ public class AccountDTO {
     private List<RoleDTO> roleDTOS;
 
     private List<TaurusUsageDTO> taurusUsageDTOS;
+
+    private List<IssueDTO> issueDTOS;
+
+    private List<PickupDTO> pickupDTOS;
 
 }

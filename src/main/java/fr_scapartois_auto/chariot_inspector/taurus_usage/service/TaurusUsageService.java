@@ -1,6 +1,7 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.service;
 
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean.Taurus;
+import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapper;
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapperImpl;
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.repositorie.TaurusRepository;
@@ -16,10 +17,14 @@ import fr_scapartois_auto.chariot_inspector.taurus_usage.repositorie.TaurusUsage
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -102,4 +107,51 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
     public Optional<TaurusUsageDTO> getById(Long id) {
         return Optional.empty();
     }
+
+    public Page<TaurusDTO> allTaurusByAccount(Long idAccount, Pageable pageable) {
+
+        Optional<Account> account = this.accountRepository.findById(idAccount);
+
+        if (account.isEmpty())
+            throw new RuntimeException("Account with id : " + idAccount + " was not found");
+
+        List<TaurusUsage> taurusUsageList = this.taurusUsageRepository.findByAccount(account.get());
+        List<Taurus> taurusList = taurusUsageList.stream().map(TaurusUsage::getTaurus).collect(Collectors.toList());
+        List<TaurusDTO> taurusDTOList = taurusList.stream().map(this.taurusMapper::fromTaurus).collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), taurusDTOList.size());
+        int end = Math.min((start + pageable.getPageSize()), taurusDTOList.size());
+
+        return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());
+    }
+
+/*    public Page<TaurusDTO> allTaurusByAccount(Long idAccount, Pageable pageable) {
+        Optional<Account> account = this.accountRepository.findById(idAccount);
+
+        if (account.isEmpty())
+            throw new RuntimeException("Account with id : " + idAccount + " was not found");
+
+        List<TaurusUsage> taurusUsageList = this.taurusUsageRepository.findByAccount(account.get());
+        List<TaurusDTO> taurusDTOList = taurusUsageList.stream()
+                .collect(Collectors.groupingBy(TaurusUsage::getTaurus))
+                .entrySet().stream()
+                .map(entry -> {
+                    Taurus taurus = entry.getKey();
+                    List<TaurusUsageDTO> taurusUsageDTOList = entry.getValue().stream()
+                            .map(this.taurusUsageMapper::fromTaurusUsage)
+                            .collect(Collectors.toList());
+                    TaurusDTO taurusDTO = this.taurusMapper.fromTaurus(taurus);
+                    taurusDTO.setTaurusUsageDTOS(taurusUsageDTOList);
+                    return taurusDTO;
+                })
+                .collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), taurusDTOList.size());
+        int end = Math.min((start + pageable.getPageSize()), taurusDTOList.size());
+
+        return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());
+    }*/
+
+
+
 }

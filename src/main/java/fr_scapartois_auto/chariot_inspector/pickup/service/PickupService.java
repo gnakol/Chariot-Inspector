@@ -3,6 +3,9 @@ package fr_scapartois_auto.chariot_inspector.pickup.service;
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
+import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
+import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
+import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
 import fr_scapartois_auto.chariot_inspector.pickup.bean.Pickup;
 import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
@@ -12,10 +15,13 @@ import fr_scapartois_auto.chariot_inspector.pickup.repositorie.PickupRepository;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,8 @@ public class PickupService implements Webservices<PickupDTO> {
     private final AccountRepository accountRepository;
 
     private final CartRepository cartRepository;
+
+    private final CartMapper cartMapper = new CartMapperImpl();
 
 
     @Override
@@ -108,6 +116,25 @@ public class PickupService implements Webservices<PickupDTO> {
     public Optional<PickupDTO> getById(Long id) {
         return this.pickupRepository.findById(id)
                 .map(this.pickupMapper::fromPickup);
+    }
+
+    public Page<CartDTO> allCartByAccount(Long idAccount, Pageable pageable)
+    {
+        Optional<Account> account = this.accountRepository.findById(idAccount);
+
+        if (account.isEmpty())
+            throw  new RuntimeException("Account with id : " +idAccount+ " was not found");
+
+        List<Pickup> pickups = this.pickupRepository.findByAccount(account.get());
+
+        List<Cart> carts = pickups.stream().map(Pickup::getCart).collect(Collectors.toList());
+
+        List<CartDTO> cartDTOS = carts.stream().map(this.cartMapper::fromCart).collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), cartDTOS.size());
+        int end = Math.min(start + pageable.getPageSize(), cartDTOS.size());
+
+        return new PageImpl<>(cartDTOS.subList(start, end), pageable, cartDTOS.size());
     }
 
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr_scapartois_auto.chariot_inspector.action_carried_out.beans.ActionCarriedOut;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
+import fr_scapartois_auto.chariot_inspector.pickup.bean.Pickup;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;
 import jakarta.persistence.*;
@@ -68,6 +69,10 @@ public class Account implements UserDetails {
     @OneToMany(mappedBy = "account")
     //@JsonIgnoreProperties({"account", "taurus"})
     private List<TaurusUsage> taurusUsages;
+
+    @OneToMany(mappedBy = "account")
+    @JsonIgnoreProperties({"account", "cart"})
+    private List<Pickup> pickups;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

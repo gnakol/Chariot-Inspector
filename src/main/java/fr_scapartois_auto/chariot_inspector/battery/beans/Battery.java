@@ -36,7 +36,7 @@ public class Battery {
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
     @JoinColumn(name = "id_cart")
-    @JsonIgnoreProperties({"cart"})
+    @JsonIgnoreProperties({"batteryList"})
     @JsonBackReference
     private Cart cart;
 }

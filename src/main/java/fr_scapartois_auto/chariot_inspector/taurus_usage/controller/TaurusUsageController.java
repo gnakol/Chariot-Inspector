@@ -1,5 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.controller;
 
+import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,11 @@ public class TaurusUsageController {
     @PutMapping("update-taurus-usage/{id}")
     public ResponseEntity<TaurusUsageDTO> updateTaurusUsage(@Validated @PathVariable Long id, @RequestBody TaurusUsageDTO taurusUsageDTO) {
         return ResponseEntity.status(202).body(this.taurusUsageService.update(id, taurusUsageDTO));
+    }
+
+    @GetMapping("all-taurus-by-account/{idAccount}")
+    public ResponseEntity<Page<TaurusDTO>> allTaurusByAccount(@Validated @PathVariable Long idAccount, Pageable pageable)
+    {
+        return ResponseEntity.ok(this.taurusUsageService.allTaurusByAccount(idAccount, pageable));
     }
 }

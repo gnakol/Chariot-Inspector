@@ -1,5 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.pickup.controller;
 
+import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.service.PickupService;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +50,11 @@ public class PickupController {
                     log.error("pickup with id : " +idPickup+ " was not found");
                     return new RuntimeException("sorry this id pickup is not found");
                 });
+    }
+
+    @GetMapping("all-cart-by-account/{idAccount}")
+    public ResponseEntity<Page<CartDTO>> allCartByAccount(@Validated @PathVariable Long idAccount, Pageable pageable)
+    {
+        return ResponseEntity.ok(this.pickupService.allCartByAccount(idAccount, pageable));
     }
 }

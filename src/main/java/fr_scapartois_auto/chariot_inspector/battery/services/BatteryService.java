@@ -14,10 +14,13 @@ import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -112,5 +115,21 @@ public class BatteryService implements Webservices<BatteryDTO> {
             throw new RuntimeException("number of battery with : "+batteryNumber+ " was not found");
 
         return battery.get().getIdBattery();
+    }
+
+    public Page<BatteryDTO> allBatteryByCart(Long idCart, Pageable pageable)
+    {
+        Optional<Cart> cart = this.cartRepository.findById(idCart);
+
+        if (cart.isEmpty())
+            throw new RuntimeException("Cart with id : " +idCart+ " was not found");
+
+        List<Battery> batteryList = this.batteryRepository.findBatteryByCart(cart.get());
+        List<BatteryDTO> batteryDTOS = batteryList.stream().map(this.batteryMapper::fromBattery).collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), batteryDTOS.size());
+        int end = Math.min((start + pageable.getPageSize()), batteryDTOS.size());
+
+        return new PageImpl<>(batteryDTOS.subList(start, end), pageable, batteryDTOS.size());
     }
 }

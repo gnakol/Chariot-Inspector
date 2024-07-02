@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +25,9 @@ public class Issue {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "created_at")
+    private LocalDate createdAt;
 
     @ManyToOne
     @JoinColumn(name = "id_account", nullable = true)

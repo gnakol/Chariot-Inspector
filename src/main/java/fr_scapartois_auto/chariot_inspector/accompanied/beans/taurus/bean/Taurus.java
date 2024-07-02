@@ -30,6 +30,6 @@ public class Taurus {
     private Long taurusNumber;
 
     @OneToMany(mappedBy = "taurus")
-    //@JsonIgnoreProperties({"taurus", "account"})
+    @JsonIgnoreProperties({"taurus", "account"})
     private List<TaurusUsage> taurusUsages;
 }
