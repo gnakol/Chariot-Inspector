@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("cart")
@@ -51,6 +53,14 @@ public class CartController {
         this.cartService.removeCartByIdRange(startId, endId);
 
         return ResponseEntity.status(202).body("Cart id range was successfully remove");
+    }
+
+    @DeleteMapping("remove-cart-by-choose-id")
+    public ResponseEntity<String> removeCartByChooseId(@Validated @RequestBody List<Long> ids)
+    {
+        this.cartService.removeCartByChooseId(ids);
+
+        return ResponseEntity.status(202).body("Remove cart by choose id was successfully");
     }
 
     @GetMapping("get-cart-by-id/{idCart}")

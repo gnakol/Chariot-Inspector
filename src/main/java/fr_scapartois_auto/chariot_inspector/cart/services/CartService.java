@@ -10,6 +10,7 @@ import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
 import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -97,9 +98,16 @@ public class CartService implements Webservices<CartDTO> {
 
     }
 
+    @Transactional
     public void removeCartByIdRange(Long startId, Long endId)
     {
         this.cartRepository.deleteByIdRange(startId, endId);
+    }
+
+    @Transactional
+    public void removeCartByChooseId(List<Long> ids)
+    {
+        this.cartRepository.deleteByIds(ids);
     }
 
     @Override

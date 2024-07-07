@@ -40,18 +40,16 @@ public class WorkSessionController {
     }
 
     @PostMapping("end-session")
-    public ResponseEntity<String> endWorkSession(@RequestBody Map<String, String> request)
-    {
+    public ResponseEntity<Void> endWorkSession(@RequestBody Map<String, String> request) {
         String workSessionId = request.get("workSessionId");
-        this.workSessionService.endWorkSession(workSessionId);
-
-        return ResponseEntity.ok("A work session was close successfully");
+        workSessionService.endWorkSession(workSessionId);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("remove-work-session/{idWorkSession}")
-    public ResponseEntity<String> removeWorkSession(@Validated @PathVariable Long idWorSession)
+    public ResponseEntity<String> removeWorkSession(@Validated @PathVariable Long idWorkSession)
     {
-        this.workSessionService.removeSession(idWorSession);
+        this.workSessionService.removeSession(idWorkSession);
 
         return ResponseEntity.status(202).body("Work Session was successfully remove");
     }
