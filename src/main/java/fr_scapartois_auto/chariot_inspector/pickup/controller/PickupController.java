@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -38,6 +40,30 @@ public class PickupController {
         return ResponseEntity.status(202).body(this.pickupService.update(idPickup, pickupDTO));
     }
 
+    @DeleteMapping("remove-pickup-by-id/{idPickup}")
+    public ResponseEntity<String> removePickup(@Validated @PathVariable Long idPickup)
+    {
+        this.pickupService.remove(idPickup);
+
+        return ResponseEntity.status(202).body("Pickup was successfully remove");
+    }
+
+    @DeleteMapping("remove-pickup-by-range-id/{startId}/{endId}")
+    public ResponseEntity<String> removePickupByIdRange(@Validated @PathVariable Long startId, @PathVariable Long endId)
+    {
+        this.pickupService.removePickupIdRange(startId, endId);
+
+        return ResponseEntity.status(202).body("Remove by range id pickup was successfully");
+    }
+
+    @DeleteMapping("remove-pickup-by-choose-id")
+    public ResponseEntity<String> removePickupByChooseId(@Validated @RequestBody List<Long> listIdsPickup)
+    {
+        this.pickupService.removePickupByChooseId(listIdsPickup);
+
+        return ResponseEntity.status(202).body("Remove pickup by choose id was successfully");
+    }
+
     @GetMapping("get-pickup-by-id/{idPickup}")
     public ResponseEntity<PickupDTO> getPickupById(@Validated @PathVariable Long idPickup)
     {
@@ -56,5 +82,11 @@ public class PickupController {
     public ResponseEntity<Page<CartDTO>> allCartByAccount(@Validated @PathVariable Long idAccount, Pageable pageable)
     {
         return ResponseEntity.ok(this.pickupService.allCartByAccount(idAccount, pageable));
+    }
+
+    @GetMapping("get-pickup-by-account-id/{idAccount}")
+    public ResponseEntity<Page<PickupDTO>> getPickupByAccountId(@Validated @PathVariable Long idAccount, Pageable pageable)
+    {
+        return ResponseEntity.ok(this.pickupService.getPickupByAccountId(idAccount, pageable));
     }
 }

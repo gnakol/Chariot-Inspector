@@ -12,7 +12,9 @@ import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.mapper.PickupMapper;
 import fr_scapartois_auto.chariot_inspector.pickup.mapper.PickupMapperImpl;
 import fr_scapartois_auto.chariot_inspector.pickup.repositorie.PickupRepository;
+import fr_scapartois_auto.chariot_inspector.session.service.WorkSessionService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -37,6 +39,8 @@ public class PickupService implements Webservices<PickupDTO> {
 
     private final CartMapper cartMapper = new CartMapperImpl();
 
+    private final WorkSessionService workSessionService;
+
 
     @Override
     public Page<PickupDTO> all(Pageable pageable) {
@@ -54,8 +58,13 @@ public class PickupService implements Webservices<PickupDTO> {
 
         if (account.isPresent() && cart.isPresent())
         {
+            String workSessionId = this.workSessionService.getActiveWorkSession(account.get().getIdAccount())
+                            .orElseThrow(() -> new RuntimeException("No active work session found"))
+                                    .getWorkSessionId();
+
             pickup.setAccount(account.get());
             pickup.setCart(cart.get());
+            pickup.setWorkSessionId(workSessionId);
 
             Pickup savedPickup = this.pickupRepository.save(pickup);
 
@@ -100,6 +109,8 @@ public class PickupService implements Webservices<PickupDTO> {
                 .orElseThrow(() -> new RuntimeException("Account or Cart is not found")));
     }
 
+    // *************************** For remove ******************************
+
     @Override
     public void remove(Long id) {
 
@@ -111,6 +122,20 @@ public class PickupService implements Webservices<PickupDTO> {
         this.pickupRepository.delete(pickup.get());
 
     }
+
+    @Transactional
+    public void removePickupIdRange(Long startId, Long endId)
+    {
+        this.pickupRepository.deleteByIdRange(startId, endId);
+    }
+
+    @Transactional
+    public void removePickupByChooseId(List<Long> listIdPickup)
+    {
+        this.pickupRepository.deleteByIds(listIdPickup);
+    }
+
+    // ***************** *********************************************
 
     @Override
     public Optional<PickupDTO> getById(Long id) {
@@ -136,5 +161,37 @@ public class PickupService implements Webservices<PickupDTO> {
 
         return new PageImpl<>(cartDTOS.subList(start, end), pageable, cartDTOS.size());
     }
+
+    public Page<PickupDTO> getPickupByAccountId(Long idAccount, Pageable pageable)
+    {
+        Optional<Account> account = this.accountRepository.findById(idAccount);
+
+        if (account.isEmpty())
+            throw new RuntimeException("Account with id : " +idAccount+ " was not found");
+
+        List<Pickup> pickups = this.pickupRepository.findByAccount(account.get());
+        List<PickupDTO> pickupDTOS = pickups.stream().map(this.pickupMapper::fromPickup).collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), pickupDTOS.size());
+        int end = Math.min((start + pageable.getPageSize()), pickupDTOS.size());
+
+        List<PickupDTO> pickupDTOList = pickupDTOS.subList(start, end);
+
+        return new PageImpl<>(pickupDTOList, pageable, pickupDTOS.size());
+    }
+
+    public List<PickupDTO> allPickupByWorkSessionId(String workSessionId)
+    {
+        return this.pickupRepository.findByWorkSessionId(workSessionId)
+                .stream()
+                .map(this.pickupMapper::fromPickup)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getWorkSessionIdsByAccountId(Long idAccount)
+    {
+        return this.pickupRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
+    }
+
 
 }

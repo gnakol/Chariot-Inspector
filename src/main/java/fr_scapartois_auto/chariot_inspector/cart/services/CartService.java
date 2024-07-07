@@ -97,6 +97,11 @@ public class CartService implements Webservices<CartDTO> {
 
     }
 
+    public void removeCartByIdRange(Long startId, Long endId)
+    {
+        this.cartRepository.deleteByIdRange(startId, endId);
+    }
+
     @Override
     public Optional<CartDTO> getById(Long id) {
         return this.cartRepository.findById(id)

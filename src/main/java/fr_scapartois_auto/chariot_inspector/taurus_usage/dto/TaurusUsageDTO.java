@@ -13,4 +13,6 @@ public class TaurusUsageDTO {
     private Long accountId;
     private Long taurusId;
     private LocalDate usageDate;
+
+    private String workSessionId;
 }

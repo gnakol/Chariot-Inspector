@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("taurus-usage")
@@ -33,9 +35,39 @@ public class TaurusUsageController {
         return ResponseEntity.status(202).body(this.taurusUsageService.update(id, taurusUsageDTO));
     }
 
+    @DeleteMapping("remove-taurus-usage-by-id/{idTaurusUsage}")
+    public ResponseEntity<String> removeTaurusUsage(@Validated @PathVariable Long idTaurusUsage)
+    {
+        this.taurusUsageService.remove(idTaurusUsage);
+
+        return ResponseEntity.status(202).body("Taurus usage was successfully remove");
+    }
+
+    @DeleteMapping("remove-taurus-usage-by-range-id/{startId}/{endId}")
+    public ResponseEntity<String> removeTaurusUsageByIdRange(@Validated @PathVariable Long startId, @PathVariable Long endId)
+    {
+        this.taurusUsageService.removeTaurusUsageByIdRange(startId, endId);
+
+        return ResponseEntity.status(202).body("Remove by range id taurus usage was successfully");
+    }
+
+    @DeleteMapping("remove-taurus-usage-by-choose-id")
+    public ResponseEntity<String> removeTaurusUsageByChooseId(@Validated @RequestBody List<Long> listIdsTaurusUsage)
+    {
+        this.taurusUsageService.removeTaurusUsageByChooseId(listIdsTaurusUsage);
+
+        return ResponseEntity.status(202).body("Remove Taurus usage by chosse id was successfully");
+    }
+
     @GetMapping("all-taurus-by-account/{idAccount}")
     public ResponseEntity<Page<TaurusDTO>> allTaurusByAccount(@Validated @PathVariable Long idAccount, Pageable pageable)
     {
         return ResponseEntity.ok(this.taurusUsageService.allTaurusByAccount(idAccount, pageable));
+    }
+
+    @GetMapping("get-taurus-usage-by-id-account/{idAccount}")
+    public ResponseEntity<Page<TaurusUsageDTO>> getTaurusUsageByAccountId(@Validated @PathVariable Long idAccount, Pageable pageable)
+    {
+        return ResponseEntity.ok(this.taurusUsageService.getTaurusUsageByAccountId(idAccount, pageable));
     }
 }

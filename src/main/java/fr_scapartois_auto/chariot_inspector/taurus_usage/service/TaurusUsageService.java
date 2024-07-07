@@ -9,12 +9,14 @@ import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
+import fr_scapartois_auto.chariot_inspector.session.service.WorkSessionService;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.mapper.TaurusUsageMapper;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.mapper.TaurusUsageMapperImpl;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.repositorie.TaurusUsageRepository;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,6 +44,8 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
 
     private final TaurusUsageMapper taurusUsageMapper = new TaurusUsageMapperImpl();
 
+    private final WorkSessionService workSessionService;
+
 
     @Override
     public Page<TaurusUsageDTO> all(Pageable pageable) {
@@ -59,17 +63,23 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
 
         if (account.isPresent() && taurus.isPresent())
         {
+            String workSessionId = this.workSessionService.getActiveWorkSession(account.get().getIdAccount())
+                            .orElseThrow(() -> new RuntimeException("No active work session found"))
+                                    .getWorkSessionId();
+
             taurusUsage.setAccount(account.get());
             taurusUsage.setTaurus(taurus.get());
+            taurusUsage.setWorkSessionId(workSessionId);
 
             TaurusUsage savedTaurusUsage = this.taurusUsageRepository.save(taurusUsage);
 
-            return this.taurusUsageMapper.fromTaurusUsage(taurusUsage);
+            return this.taurusUsageMapper.fromTaurusUsage(savedTaurusUsage);
         }
         else
         {
             throw new RuntimeException("Account or Taurus not found");
         }
+
     }
 
     @Override
@@ -98,10 +108,35 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         }
     }
 
+    // ***************** for remove*****************************
+
     @Override
     public void remove(Long id) {
 
+        Optional<TaurusUsage> taurusUsage = this.taurusUsageRepository.findById(id);
+
+        if (taurusUsage.isEmpty())
+            throw new RuntimeException("Taurus usage with id : " +id+ " was not found");
+
+        this.taurusUsageRepository.delete(taurusUsage.get());
+
     }
+
+    @Transactional
+    public void removeTaurusUsageByIdRange(Long startId, Long endId)
+    {
+        this.taurusUsageRepository.deleteByIdRange(startId, endId);
+    }
+
+    @Transactional
+    public void removeTaurusUsageByChooseId(List<Long> listIdTaurusUsage)
+    {
+        this.taurusUsageRepository.deleteByIds(listIdTaurusUsage);
+    }
+
+    // ***************** *********************************************
+
+
 
     @Override
     public Optional<TaurusUsageDTO> getById(Long id) {
@@ -125,32 +160,40 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());
     }
 
-/*    public Page<TaurusDTO> allTaurusByAccount(Long idAccount, Pageable pageable) {
+    public Page<TaurusUsageDTO> getTaurusUsageByAccountId(Long idAccount, Pageable pageable) {
+
         Optional<Account> account = this.accountRepository.findById(idAccount);
 
         if (account.isEmpty())
-            throw new RuntimeException("Account with id : " + idAccount + " was not found");
+            throw new RuntimeException("Account with id : " +idAccount+ " was not found");
 
-        List<TaurusUsage> taurusUsageList = this.taurusUsageRepository.findByAccount(account.get());
-        List<TaurusDTO> taurusDTOList = taurusUsageList.stream()
-                .collect(Collectors.groupingBy(TaurusUsage::getTaurus))
-                .entrySet().stream()
-                .map(entry -> {
-                    Taurus taurus = entry.getKey();
-                    List<TaurusUsageDTO> taurusUsageDTOList = entry.getValue().stream()
-                            .map(this.taurusUsageMapper::fromTaurusUsage)
-                            .collect(Collectors.toList());
-                    TaurusDTO taurusDTO = this.taurusMapper.fromTaurus(taurus);
-                    taurusDTO.setTaurusUsageDTOS(taurusUsageDTOList);
-                    return taurusDTO;
-                })
+        List<TaurusUsage> taurusUsages = this.taurusUsageRepository.findByAccount(account.get());
+
+        List<TaurusUsageDTO> taurusUsageDTOS = taurusUsages.stream()
+                .map(this.taurusUsageMapper::fromTaurusUsage)
                 .collect(Collectors.toList());
 
-        int start = Math.min((int) pageable.getOffset(), taurusDTOList.size());
-        int end = Math.min((start + pageable.getPageSize()), taurusDTOList.size());
+        int start = Math.min((int) pageable.getOffset(), taurusUsageDTOS.size());
+        int end = Math.min((start + pageable.getPageSize()), taurusUsageDTOS.size());
 
-        return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());
-    }*/
+        List<TaurusUsageDTO> paginatedList = taurusUsageDTOS.subList(start, end);
+        return new PageImpl<>(paginatedList, pageable, taurusUsageDTOS.size());
+    }
+
+    public List<TaurusUsageDTO> allTaurusUsageByWorkSessionId(String workSessionId)
+    {
+        return this.taurusUsageRepository.findByWorkSessionId(workSessionId)
+                .stream()
+                .map(this.taurusUsageMapper::fromTaurusUsage)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getWorkSessionIdsByAccountId(Long idAccount)
+    {
+        return this.taurusUsageRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
+    }
+
+
 
 
 

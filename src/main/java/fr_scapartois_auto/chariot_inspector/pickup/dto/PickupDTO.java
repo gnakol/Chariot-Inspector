@@ -18,4 +18,6 @@ public class PickupDTO {
     private LocalDateTime pickupDateTime;
 
     private LocalDateTime returnDateTime;
+
+    private String workSessionId;
 }

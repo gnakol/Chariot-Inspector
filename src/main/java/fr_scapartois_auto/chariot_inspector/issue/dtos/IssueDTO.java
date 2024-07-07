@@ -21,4 +21,6 @@ public class IssueDTO {
     private LocalDate createdAt;
 
     private Long accountId;
+
+    private String workSessionId;
 }

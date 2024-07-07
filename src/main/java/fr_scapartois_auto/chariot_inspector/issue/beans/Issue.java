@@ -29,9 +29,12 @@ public class Issue {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "id_account", nullable = true)
     @JsonIgnoreProperties({"issues", "roles", "password"})
     private Account account;
+
+    @Column(name = "work_session_id")
+    private String workSessionId;
 
 }

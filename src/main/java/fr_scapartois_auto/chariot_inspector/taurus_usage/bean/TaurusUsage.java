@@ -31,4 +31,7 @@ public class TaurusUsage {
     private Taurus taurus;
 
     private LocalDate usageDate;
+
+    @Column(name = "work_session_id")
+    private String workSessionId;
 }

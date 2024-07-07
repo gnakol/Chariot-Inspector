@@ -34,4 +34,7 @@ public class Pickup {
     private LocalDateTime pickupDateTime;
     @Column(name = "return_date_time")
     private LocalDateTime returnDateTime;
+
+    @Column(name = "work_session_id")
+    private String workSessionId;
 }

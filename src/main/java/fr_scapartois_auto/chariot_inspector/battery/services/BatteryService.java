@@ -132,4 +132,17 @@ public class BatteryService implements Webservices<BatteryDTO> {
 
         return new PageImpl<>(batteryDTOS.subList(start, end), pageable, batteryDTOS.size());
     }
+
+    public List<BatteryDTO> allBatteryByIdCart(Long idCart)
+    {
+        Optional<Cart> cart = this.cartRepository.findById(idCart);
+
+        if (cart.isEmpty())
+            throw new RuntimeException("Cart with id : " +idCart+ " was not found");
+
+        return this.batteryRepository.findBatteryByCart(cart.get())
+                .stream()
+                .map(this.batteryMapper::fromBattery)
+                .collect(Collectors.toList());
+    }
 }

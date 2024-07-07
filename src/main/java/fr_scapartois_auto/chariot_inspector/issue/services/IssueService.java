@@ -7,6 +7,7 @@ import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
 import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapper;
 import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapperImpl;
 import fr_scapartois_auto.chariot_inspector.issue.repositories.IssueRepository;
+import fr_scapartois_auto.chariot_inspector.session.service.WorkSessionService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,8 @@ public class IssueService implements Webservices<IssueDTO> {
 
     private final AccountRepository accountRepository;
 
+    private final WorkSessionService workSessionService;
+
 
     @Override
     public Page<IssueDTO> all(Pageable pageable) {
@@ -46,7 +49,12 @@ public class IssueService implements Webservices<IssueDTO> {
 
         if (account.isPresent())
         {
+            String workSessionId = this.workSessionService.getActiveWorkSession(account.get().getIdAccount())
+                            .orElseThrow(() -> new RuntimeException("No active work session found"))
+                                    .getWorkSessionId();
+
             issue.setAccount(account.get());
+            issue.setWorkSessionId(workSessionId);
             Issue savedIssue = this.issueRepository.save(issue);
 
             return this.issueMapper.fromIssue(savedIssue);
@@ -109,5 +117,18 @@ public class IssueService implements Webservices<IssueDTO> {
         return new PageImpl<>(issueDTOS.subList(start, end), pageable, issueDTOS.size());
 
 
+    }
+
+    public List<IssueDTO> allIssueByWorkSessionId(String workSessionId)
+    {
+        return this.issueRepository.findByWorkSessionId(workSessionId)
+                .stream()
+                .map(this.issueMapper::fromIssue)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getWorkSessionIdsByAccountId(Long idAccount)
+    {
+        return this.issueRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
     }
 }

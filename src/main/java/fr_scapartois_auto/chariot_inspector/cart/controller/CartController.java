@@ -45,6 +45,14 @@ public class CartController {
         return ResponseEntity.status(202).body("Cart with id :" +idCart+ "was successfully remove");
     }
 
+    @DeleteMapping("remove-cart-by-id-range/{startId}/{endId}")
+    public ResponseEntity<String> removeCartByIdRange(@Validated @PathVariable Long startId, @PathVariable Long endId)
+    {
+        this.cartService.removeCartByIdRange(startId, endId);
+
+        return ResponseEntity.status(202).body("Cart id range was successfully remove");
+    }
+
     @GetMapping("get-cart-by-id/{idCart}")
     public ResponseEntity<CartDTO> getBYIdCart(@Validated @PathVariable Long idCart)
     {
