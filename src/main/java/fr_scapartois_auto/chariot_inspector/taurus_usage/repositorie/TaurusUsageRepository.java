@@ -34,6 +34,9 @@ public interface TaurusUsageRepository extends JpaRepository<TaurusUsage, Long> 
     @Query("DELETE FROM TaurusUsage t WHERE t.idTaurusUsage IN :ids")
     void deleteByIds(@Param("ids") List<Long> ids);
 
+    @Query("SELECT t FROM TaurusUsage t WHERE t.taurus.idTaurus = :taurusId")
+    Optional<TaurusUsage> findByTaurusId(@Param("taurusId") Long taurusId);
+
 
 
 

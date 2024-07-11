@@ -193,6 +193,16 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         return this.taurusUsageRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
     }
 
+    public Optional<TaurusUsageDTO> getTaurusUsageByTaurusId(Long taurusId) {
+
+        Optional<TaurusUsage> taurusUsage = this.taurusUsageRepository.findByTaurusId(taurusId);
+
+        if (taurusUsage.isEmpty())
+            throw new RuntimeException("TaurusUsage with id : "+taurusId+ " was not found");
+
+        return taurusUsage.map(this.taurusUsageMapper::fromTaurusUsage);
+    }
+
 
 
 

@@ -4,8 +4,10 @@ import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusD
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("taurus-usage")
+@Slf4j
 public class TaurusUsageController {
 
     private final TaurusUsageService taurusUsageService;
@@ -69,5 +72,19 @@ public class TaurusUsageController {
     public ResponseEntity<Page<TaurusUsageDTO>> getTaurusUsageByAccountId(@Validated @PathVariable Long idAccount, Pageable pageable)
     {
         return ResponseEntity.ok(this.taurusUsageService.getTaurusUsageByAccountId(idAccount, pageable));
+    }
+
+    @GetMapping("get-taurus-usage-by-taurus-id/{taurusId}")
+    public ResponseEntity<TaurusUsageDTO> getTaurusUsageByTaurusId(@PathVariable Long taurusId) {
+
+        return this.taurusUsageService.getTaurusUsageByTaurusId(taurusId)
+                .map(taurusUsageDTO -> {
+                    log.info("taurus usage with id :"+taurusId+ " was found");
+                    return new ResponseEntity<>(taurusUsageDTO, HttpStatus.OK);
+                })
+                .orElseThrow(() -> {
+                    log.error("taurus usage with id : "+taurusId+ " was not found");
+                    throw new RuntimeException("not found this id");
+                });
     }
 }

@@ -1,6 +1,9 @@
 package fr_scapartois_auto.chariot_inspector.issue.services;
 
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
+import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
+import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
+import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
@@ -30,6 +33,8 @@ public class IssueService implements Webservices<IssueDTO> {
     private final IssueMapper issueMapper = new IssueMapperImpl();
 
     private final AccountRepository accountRepository;
+
+    private final AccountMapper accountMapper = new AccountMapperImpl();
 
     private final WorkSessionService workSessionService;
 
@@ -95,6 +100,18 @@ public class IssueService implements Webservices<IssueDTO> {
 
     }
 
+    @Transactional
+    public void removeIssueByIdRange(Long startId, Long endId)
+    {
+        this.issueRepository.deleteByIdRange(startId, endId);
+    }
+
+    @Transactional
+    public void removeIssueByChooseId(List<Long> listIdIssue)
+    {
+        this.issueRepository.deleteByIds(listIdIssue);
+    }
+
     @Override
     public Optional<IssueDTO> getById(Long id) {
         return this.issueRepository.findById(id)
@@ -131,4 +148,19 @@ public class IssueService implements Webservices<IssueDTO> {
     {
         return this.issueRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
     }
+
+    public Long getIdIssueByWorkSessionId(String workSessionId) {
+        // Récupérer les issues associées au workSessionId
+        List<Issue> issues = this.issueRepository.findByWorkSessionId(workSessionId);
+
+        // Si aucune issue n'est trouvée, lancer une exception
+        if (issues.isEmpty()) {
+            throw new RuntimeException("No issues found for workSessionId: " + workSessionId);
+        }
+
+        // Retourner l'ID de la première issue trouvée
+        return issues.get(0).getIdIssue();
+    }
+
+
 }

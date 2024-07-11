@@ -133,6 +133,23 @@ public class TokenService {
 
     }
 
+    public boolean validateToken(String token) {
+        try {
+            if (isTokenExpired(token)) {
+                return false;
+            }
+
+            if (isTokenDisabled(token)) {
+                return false;
+            }
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
 
 
 

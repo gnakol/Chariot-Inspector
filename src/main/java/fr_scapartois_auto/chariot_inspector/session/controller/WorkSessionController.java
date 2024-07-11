@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,7 +29,7 @@ public class WorkSessionController {
         return ResponseEntity.ok(this.workSessionService.allWorkSession(pageable));
     }
 
-    @PostMapping("/start-session")
+    @PostMapping("start-session")
     public ResponseEntity<Map<String, String>> startWorkSession(@RequestBody Map<String, Long> request)
     {
         Long idAccount = request.get("accountId");
@@ -52,5 +53,21 @@ public class WorkSessionController {
         this.workSessionService.removeSession(idWorkSession);
 
         return ResponseEntity.status(202).body("Work Session was successfully remove");
+    }
+
+    @DeleteMapping("remove-work-session-by-range-id/{startId}/{endId}")
+    public ResponseEntity<String> removeWorkSessionByIdRange(@Validated @PathVariable Long startId, @PathVariable Long endId)
+    {
+        this.workSessionService.removeWorkSessionByIdRange(startId, endId);
+
+        return ResponseEntity.status(202).body("Remove by range id work session was successfully");
+    }
+
+    @DeleteMapping("remove-work-session-by-choose-id")
+    public ResponseEntity<String> removeWorkSessionByChooseId(@Validated @RequestBody List<Long> listIdsWorkSession)
+    {
+        this.workSessionService.removeWorkSessionByChooseId(listIdsWorkSession);
+
+        return ResponseEntity.status(202).body("Remove work session by chosse id was successfully");
     }
 }

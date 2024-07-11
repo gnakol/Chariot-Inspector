@@ -1,5 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.issue.controller;
 
+import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
 import fr_scapartois_auto.chariot_inspector.issue.services.IssueService;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -46,6 +49,22 @@ public class IssueController {
         return ResponseEntity.status(202).body("Issue with id : " +idIssue+ " was successfully remove");
     }
 
+    @DeleteMapping("remove-issue-by-range-id/{startId}/{endId}")
+    public ResponseEntity<String> removeIssueByIdRange(@Validated @PathVariable Long startId, @PathVariable Long endId)
+    {
+        this.issueService.removeIssueByIdRange(startId, endId);
+
+        return ResponseEntity.status(202).body("Remove by range id issue was successfully");
+    }
+
+    @DeleteMapping("remove-issue-by-choose-id")
+    public ResponseEntity<String> removeIssueByChooseId(@Validated @RequestBody List<Long> listIdsIssue)
+    {
+        this.issueService.removeIssueByChooseId(listIdsIssue);
+
+        return ResponseEntity.status(202).body("Remove Issue by choose id was successfully");
+    }
+
     @GetMapping("get-issue-by-id/{idIssue}")
     public ResponseEntity<IssueDTO> getByIdIssue(@Validated @PathVariable Long idIssue)
     {
@@ -56,7 +75,7 @@ public class IssueController {
                 })
                 .orElseThrow(() -> {
                     log.error("issue with id : " +idIssue+ " was not found");
-                    throw  new RuntimeException("sorry this id was not found");
+                    throw  new RuntimeException("sorry this id : "+idIssue+" was not found");
                 });
     }
 
@@ -64,5 +83,14 @@ public class IssueController {
     public ResponseEntity<Page<IssueDTO>> allIssueByAccount(@Validated @PathVariable Long idAccount, Pageable pageable)
     {
         return ResponseEntity.ok(this.issueService.allIssueByAccount(idAccount, pageable));
+    }
+
+    @GetMapping("get-id-issue-by-work-session-id/{workSessionId}")
+    public ResponseEntity<Long> getIdIssueByWorkSessionId(@PathVariable String workSessionId) {
+
+        Long idIssue =  this.issueService.getIdIssueByWorkSessionId(workSessionId);
+
+
+        return ResponseEntity.ok(idIssue);
     }
 }

@@ -3,6 +3,7 @@ package fr_scapartois_auto.chariot_inspector.authentication;
 import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.services.AccountService;
 import fr_scapartois_auto.chariot_inspector.security.TokenService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,4 +42,21 @@ public class AuthController {
         }
         return null;
     }
+
+    @PostMapping("disconnect")
+    public ResponseEntity<Map<String, String>> disconnect(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            this.tokenService.invalidateToken(token);
+            Map<String, String> response = Map.of("message", "disconnection successful");
+            return ResponseEntity.ok(response);
+        }
+
+        Map<String, String> response = Map.of("error", "Aucun token fourni");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+
 }

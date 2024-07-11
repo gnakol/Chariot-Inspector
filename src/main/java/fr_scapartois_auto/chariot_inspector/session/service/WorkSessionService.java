@@ -4,6 +4,7 @@ import fr_scapartois_auto.chariot_inspector.exception.other.ResourceNotFoundExce
 import fr_scapartois_auto.chariot_inspector.session.bean.WorkSession;
 import fr_scapartois_auto.chariot_inspector.session.bean.WorkSessionUtil;
 import fr_scapartois_auto.chariot_inspector.session.repositorie.WorkSessionRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -77,6 +78,18 @@ public class WorkSessionService {
             throw new RuntimeException(("Work Session with id : "+idWorkSession+ " was not found"));
 
         this.workSessionRepository.delete(workSession.get());
+    }
+
+    @Transactional
+    public void removeWorkSessionByIdRange(Long startId, Long endId)
+    {
+        this.workSessionRepository.deleteByIdRange(startId, endId);
+    }
+
+    @Transactional
+    public void removeWorkSessionByChooseId(List<Long> listIdWorkSession)
+    {
+        this.workSessionRepository.deleteByIds(listIdWorkSession);
     }
 
 
