@@ -1,7 +1,8 @@
 package fr_scapartois_auto.chariot_inspector.action_carried_out.controller;
 
 import fr_scapartois_auto.chariot_inspector.action_carried_out.beans.ActionCarriedOut;
-import fr_scapartois_auto.chariot_inspector.action_carried_out.services.ActionCarriedOutServe;
+import fr_scapartois_auto.chariot_inspector.action_carried_out.dtos.ActionCarriedOutDTO;
+import fr_scapartois_auto.chariot_inspector.action_carried_out.services.ActionCarriedOutService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -17,38 +18,38 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("action-carried-out")
 public class ActionCarriedOutController {
 
-    public final ActionCarriedOutServe actionCarriedOutServe;
+    public final ActionCarriedOutService actionCarriedOutService;
 
     @GetMapping("all-action-carried-out")
-    public ResponseEntity<Page<ActionCarriedOut>> allActionCarriedOut(Pageable pageable)
+    public ResponseEntity<Page<ActionCarriedOutDTO>> allActionCarriedOut(Pageable pageable)
     {
-        return ResponseEntity.ok(this.actionCarriedOutServe.all(pageable));
+        return ResponseEntity.ok(this.actionCarriedOutService.all(pageable));
     }
 
     @PostMapping("add-new-action-carried-out")
-    public ResponseEntity<ActionCarriedOut> addNewActionCarriedOut(@Validated @RequestBody ActionCarriedOut actionCarriedOut)
+    public ResponseEntity<ActionCarriedOutDTO> addNewActionCarriedOut(@Validated @RequestBody ActionCarriedOutDTO actionCarriedOut)
     {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.actionCarriedOutServe.add(actionCarriedOut));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.actionCarriedOutService.add(actionCarriedOut));
     }
 
     @PutMapping("update-action-carried-out/{idActionCarriedOut}")
-    public ResponseEntity<ActionCarriedOut> updateActionCarriedOut(@Validated @PathVariable Long idActionCarriedOut, @RequestBody ActionCarriedOut actionCarriedOut)
+    public ResponseEntity<ActionCarriedOutDTO> updateActionCarriedOut(@Validated @PathVariable Long idActionCarriedOut, @RequestBody ActionCarriedOutDTO actionCarriedOut)
     {
-        return ResponseEntity.status(202).body(this.actionCarriedOutServe.update(idActionCarriedOut, actionCarriedOut));
+        return ResponseEntity.status(202).body(this.actionCarriedOutService.update(idActionCarriedOut, actionCarriedOut));
     }
 
     @DeleteMapping("remove-action-carried-out/{idActionCarriedOut}")
     public ResponseEntity<String> removeActionCarriedOut(@Validated @PathVariable Long idActionCarriedOut)
     {
-        this.actionCarriedOutServe.remove(idActionCarriedOut);
+        this.actionCarriedOutService.remove(idActionCarriedOut);
 
         return ResponseEntity.status(202).body("Action carried out with id : " +idActionCarriedOut+ " was successfully remove");
     }
 
     @GetMapping("get-action-carried-out-by-id/{idActionCarriedOut}")
-    public ResponseEntity<ActionCarriedOut> getActionCarriedOutById(@Validated @PathVariable Long idActionCarriedOut)
+    public ResponseEntity<ActionCarriedOutDTO> getActionCarriedOutById(@Validated @PathVariable Long idActionCarriedOut)
     {
-        return this.actionCarriedOutServe.getById(idActionCarriedOut)
+        return this.actionCarriedOutService.getById(idActionCarriedOut)
                 .map(actionCarriedOut -> {
                     log.info("Action carried with id : " +idActionCarriedOut+ " was found");
                     return new ResponseEntity<>(actionCarriedOut, HttpStatus.OK);

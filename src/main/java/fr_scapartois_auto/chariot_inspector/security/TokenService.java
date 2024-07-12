@@ -31,8 +31,8 @@ public class TokenService {
     private TokenRepository tokenRepository;
 
     public Map<String, String> generate(String username) {
-            Account utilisateur = (Account) this.accountService.loadUserByUsername(username);
-        return this.generateJwt(utilisateur);
+            Account account = (Account) this.accountService.loadUserByUsername(username);
+        return this.generateJwt(account);
     }
 
     private Map<String, String> generateJwt(Account account) {
@@ -41,6 +41,7 @@ public class TokenService {
 
         final Map<String, Object> claims = Map.of(
                 "name", account.getName(),
+                "roles", account.getRoles(), // Assurez-vous que Account a une méthode getRoles() qui retourne les rôles de l'utilisateur
                 Claims.EXPIRATION, new Date(expirationTime),
                 Claims.SUBJECT, account.getEmail()
         );
@@ -63,6 +64,7 @@ public class TokenService {
         this.tokenRepository.save(tokenBean);
         return Map.of("bearer", bearer);
     }
+
 
     private <T> T getClaim(String token, Function<Claims, T> function) {
         Claims claims = getAllClaims(token);
