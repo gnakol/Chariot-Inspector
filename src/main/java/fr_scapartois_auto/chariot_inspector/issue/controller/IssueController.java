@@ -93,4 +93,9 @@ public class IssueController {
 
         return ResponseEntity.ok(idIssue);
     }
+
+    @GetMapping("all-issue-with-description")
+    public ResponseEntity<Page<IssueDTO>> getIssuesWithDescription(Pageable pageable) {
+        return ResponseEntity.ok(issueService.allIssuesWithDescription(pageable));
+    }
 }

@@ -48,7 +48,11 @@ public class IssueService implements Webservices<IssueDTO> {
     @Override
     public IssueDTO add(IssueDTO e) {
 
+        if (e.getDescription() == null)
+            e.setDescription("RAS");
+
         Issue issue = this.issueMapper.fromIssueDTO(e);
+
 
         Optional<Account> account = this.accountRepository.findById(e.getAccountId());
 
@@ -162,5 +166,11 @@ public class IssueService implements Webservices<IssueDTO> {
         return issues.get(0).getIdIssue();
     }
 
+
+    @Transactional
+    public Page<IssueDTO> allIssuesWithDescription(Pageable pageable) {
+        return issueRepository.findIssuesWithDescription(pageable)
+                .map(issueMapper::fromIssue);
+    }
 
 }

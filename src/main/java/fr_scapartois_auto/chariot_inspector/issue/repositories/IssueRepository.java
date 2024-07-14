@@ -2,6 +2,8 @@ package fr_scapartois_auto.chariot_inspector.issue.repositories;
 
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,5 +32,8 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Modifying
     @Query("DELETE FROM Issue t WHERE t.idIssue IN :ids")
     void deleteByIds(@Param("ids") List<Long> ids);
+
+    @Query("SELECT i FROM Issue i WHERE i.description IS NOT NULL AND i.description <> 'RAS'")
+    Page<Issue> findIssuesWithDescription(Pageable pageable);
 
 }
