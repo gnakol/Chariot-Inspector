@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -172,5 +173,17 @@ public class IssueService implements Webservices<IssueDTO> {
         return issueRepository.findIssuesWithDescription(pageable)
                 .map(issueMapper::fromIssue);
     }
+
+/*    public Page<IssueDTO> allUnresolvedIssuesByTeamAndShift(String team, LocalDateTime shiftStart, LocalDateTime shiftEnd, Pageable pageable)
+    {
+        List<Issue> issues = this.issueRepository.findUnresolvedIssuesByTeamAndShift(team, shiftStart, shiftEnd);
+
+        List<IssueDTO> issueDTOS = issues.stream().map(this.issueMapper::fromIssue).collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), issueDTOS.size());
+        int end = Math.min((start + pageable.getPageSize()), issueDTOS.size());
+
+        return new  PageImpl<>(issueDTOS.subList(start, end), pageable, issueDTOS.size());
+    }*/
 
 }

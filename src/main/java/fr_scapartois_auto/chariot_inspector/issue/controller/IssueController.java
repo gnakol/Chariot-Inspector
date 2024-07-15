@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -98,4 +99,10 @@ public class IssueController {
     public ResponseEntity<Page<IssueDTO>> getIssuesWithDescription(Pageable pageable) {
         return ResponseEntity.ok(issueService.allIssuesWithDescription(pageable));
     }
+
+/*    @GetMapping("all-issue-by-team-and-date")
+    public ResponseEntity<Page<IssueDTO>> allIssueByTeamAndDateWork(@Validated @RequestParam String team, @RequestParam LocalDateTime shiftStart, @RequestParam LocalDateTime shiftEnd, Pageable pageable)
+    {
+        return ResponseEntity.ok(this.issueService.allUnresolvedIssuesByTeamAndShift(team, shiftStart, shiftEnd, pageable));
+    }*/
 }

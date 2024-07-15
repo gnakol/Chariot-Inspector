@@ -25,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -60,13 +61,36 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
         return null;
     }
 
-    public AccountDTO addNewAccount(AccountDTO accountDTO)
-    {
-        accountDTO.setPassword(this.bCryptPasswordEncoder.encode(accountDTO.getPassword()));
-        accountDTO.setRoleDTOS(this.roleService.getDefaultRoles());
+    public AccountDTO addNewAccount(AccountDTO accountDTO) {
+        // Convertir le DTO en entité Account
+        Account account = this.accountMapper.fromAccountDTO(accountDTO);
 
-        return this.accountMapper.fromAccount(this.accountRepository.save(this.accountMapper.fromAccountDTO(accountDTO)));
+        // Vérifier si des rôles sont fournis
+        if (account.getRoles() == null || account.getRoles().isEmpty()) {
+            // Si aucun rôle n'est fourni, utiliser les rôles par défaut
+            account.setRoles(this.roleService.getDefaultRoles().stream()
+                    .map(roleDTO -> this.roleRepository.findById(roleDTO.getIdRole()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()));
+        } else {
+            // Ajouter les rôles fournis
+            List<Role> roles = account.getRoles().stream()
+                    .map(role -> this.roleRepository.findById(role.getIdRole()).orElse(null))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            account.setRoles(roles);
+        }
+
+        // Encoder le mot de passe
+        account.setPassword(this.bCryptPasswordEncoder.encode(account.getPassword()));
+
+        // Sauvegarder le compte
+        Account accountSaved = this.accountRepository.save(account);
+
+        // Retourner le DTO du compte sauvegardé
+        return this.accountMapper.fromAccount(accountSaved);
     }
+
 
     @Override
     public AccountDTO update(Long id, AccountDTO e) {
@@ -87,6 +111,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
                             if (e.getService() != null)
                                 a.setService(e.getService());
+                            if (e.getCivility() != null)
+                                a.setCivility(e.getCivility());
 
                             if (e.getRoleDTOS() != null) {
                                 List<Role> roles = e.getRoleDTOS().stream()

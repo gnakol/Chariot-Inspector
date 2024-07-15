@@ -37,14 +37,14 @@ public class AccountController {
     }
 
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_AGENT_MAITRISE')")
     @PutMapping("update-account/{idAccount}")
     public ResponseEntity<AccountDTO> updateAccount(@Validated @PathVariable Long idAccount, @RequestBody AccountDTO accountDTO)
     {
         return ResponseEntity.status(202).body(this.accountService.update(idAccount, accountDTO));
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_CHEF_EQUIPE') or hasAuthority('ROLE_AGENT_MAITRISE')")
+    //@PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_CHEF_EQUIPE') or hasAuthority('ROLE_AGENT_MAITRISE')")
     @GetMapping("get-account-by-id/{idAccount}")
     public ResponseEntity<AccountDTO> getByIdAccount(@Validated @PathVariable Long idAccount)
     {
@@ -59,7 +59,7 @@ public class AccountController {
                 });
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_AGENT_MAITRISE')")
     @DeleteMapping("remove-account/{idAccount}")
     public ResponseEntity<String> removeAccount(@Validated @PathVariable Long idAccount)
     {

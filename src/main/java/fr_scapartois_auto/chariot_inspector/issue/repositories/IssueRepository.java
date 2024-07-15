@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,5 +37,23 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
 
     @Query("SELECT i FROM Issue i WHERE i.description IS NOT NULL AND i.description <> 'RAS'")
     Page<Issue> findIssuesWithDescription(Pageable pageable);
+
+/*    @Query("SELECT i FROM Issue i JOIN i.account a JOIN a.accountTeams at JOIN at.team t JOIN at.shift s LEFT JOIN ActionCarriedOut ac ON i.idIssue = ac.issue.idIssue WHERE ac.idActionCarriedOut IS NULL AND t.name = :team AND i.createdAt BETWEEN :shiftStart AND :shiftEnd AND at.startDate <= :currentDate AND (at.endDate IS NULL OR at.endDate >= :currentDate)")
+    List<Issue> findUnresolvedIssuesByTeamAndShift(@Param("team") String team, @Param("shiftStart") LocalDateTime shiftStart, @Param("shiftEnd") LocalDateTime shiftEnd, @Param("currentDate") LocalDate currentDate);*/
+
+/*    @Query("SELECT i FROM Issue i " +
+            "JOIN i.account a " +
+            "JOIN a.accountTeams at " +
+            "JOIN at.team t " +
+            "JOIN at.shift s " +
+            "LEFT JOIN ActionCarriedOut ac ON i.idIssue = ac.issue.idIssue " +
+            "WHERE ac.idActionCarriedOut IS NULL " +
+            "AND t.name = :team " +
+            "AND i.createdAt BETWEEN :shiftStart AND :shiftEnd " +
+            "AND at.startDate <= :shiftStart " +
+            "AND (at.endDate IS NULL OR at.endDate >= :shiftEnd)")
+    List<Issue> findUnresolvedIssuesByTeamAndShift(@Param("team") String team,
+                                                   @Param("shiftStart") LocalDateTime shiftStart,
+                                                   @Param("shiftEnd") LocalDateTime shiftEnd);*/
 
 }
