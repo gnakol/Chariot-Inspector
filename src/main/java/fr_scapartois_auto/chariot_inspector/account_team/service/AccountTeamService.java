@@ -132,4 +132,14 @@ public class AccountTeamService implements Webservices<AccountTeamDTO> {
         Optional<AccountTeam> accountTeamOpt = this.accountTeamRepository.findByWorkSessionId(workSessionId);
         return accountTeamOpt.map(accountTeamMapper::fromAccountTeam);
     }
+
+    public Optional<AccountTeamDTO> getAccountTeamByWorkSessionId(String workSessionId)
+    {
+        Optional<AccountTeam> accountTeam = this.accountTeamRepository.findByWorkSessionId(workSessionId);
+
+        if (accountTeam.isEmpty())
+            throw new RuntimeException("this work session id was not found");
+
+        return accountTeam.map(this.accountTeamMapper::fromAccountTeam);
+    }
 }

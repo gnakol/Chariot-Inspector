@@ -1,5 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.account_team.repository;
 
+import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.account_team.bean.AccountTeam;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,4 +19,6 @@ public interface AccountTeamRepository extends JpaRepository<AccountTeam, Long> 
     Optional<AccountTeam> findByAccountIdAndCurrentDate(@Param("accountId") Long accountId, @Param("currentDate") LocalDate currentDate);
 
     Optional<AccountTeam> findByWorkSessionId(String workSessionId);
+
+    Optional<AccountTeam> findByAccount(Account account);
 }

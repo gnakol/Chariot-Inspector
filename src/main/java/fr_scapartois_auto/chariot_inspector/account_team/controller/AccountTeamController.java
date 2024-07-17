@@ -44,4 +44,18 @@ public class AccountTeamController {
                     throw new RuntimeException("Sorry this id account team not found");
                 });
     }
+
+    @GetMapping("get-account-team-by-work-session-id")
+    public ResponseEntity<AccountTeamDTO> getAccountTeamByIdAccount(@Validated @RequestParam String workSessionId)
+    {
+        return this.accountTeamService.getAccountTeamByWorkSessionId(workSessionId)
+                .map(accountTeamDTO -> {
+                    log.info("Account team with id : " +workSessionId+ " was found");
+                    return new ResponseEntity<>(accountTeamDTO, HttpStatus.OK);
+                })
+                .orElseThrow(() -> {
+                    log.error("Account team with id : "+workSessionId+ " was not found");
+                    throw  new RuntimeException("sorry this id is not found");
+                });
+    }
 }
