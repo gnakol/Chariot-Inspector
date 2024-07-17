@@ -29,4 +29,8 @@ public class HistoryEntryDTO {
     private List<BatteryDTO> batteryDTOS;
 
     private LocalDate usageDate;
+
+    private String teamName;
+
+    private String shiftName;
 }

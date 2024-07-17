@@ -28,7 +28,7 @@ public class AccountTeamController {
     @PostMapping("add-new-account-team")
     public ResponseEntity<AccountTeamDTO> addNewAccountTeam(@Validated @RequestBody AccountTeamDTO accountTeamDTO)
     {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.accountTeamService.add(accountTeamDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.accountTeamService.addOrUpdateAccountTeam(accountTeamDTO));
     }
 
     @GetMapping("get-account-team-by-id/{idAccountTeam}")

@@ -41,4 +41,7 @@ public class AccountTeam {
 
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @Column(name = "work_session_id")
+    private String workSessionId;
 }

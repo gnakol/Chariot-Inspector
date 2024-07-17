@@ -4,6 +4,11 @@ import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusD
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.service.TaurusService;
 import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.services.AccountService;
+import fr_scapartois_auto.chariot_inspector.account_team.bean.AccountTeam;
+import fr_scapartois_auto.chariot_inspector.account_team.dto.AccountTeamDTO;
+import fr_scapartois_auto.chariot_inspector.account_team.mapper.AccountTeamMapper;
+import fr_scapartois_auto.chariot_inspector.account_team.mapper.AccountTeamMapperImpl;
+import fr_scapartois_auto.chariot_inspector.account_team.service.AccountTeamService;
 import fr_scapartois_auto.chariot_inspector.battery.dtos.BatteryDTO;
 import fr_scapartois_auto.chariot_inspector.battery.services.BatteryService;
 import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
@@ -13,9 +18,13 @@ import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
 import fr_scapartois_auto.chariot_inspector.issue.services.IssueService;
 import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.service.PickupService;
+import fr_scapartois_auto.chariot_inspector.shitf.bean.Shift;
+import fr_scapartois_auto.chariot_inspector.shitf.repository.ShiftRepository;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
+import fr_scapartois_auto.chariot_inspector.team.bean.Team;
+import fr_scapartois_auto.chariot_inspector.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,6 +51,14 @@ public class HistoryService {
     private final TaurusService taurusService;
 
     private final CartService cartService;
+
+    private final AccountTeamService accountTeamService;
+
+    private final AccountTeamMapper accountTeamMapper = new AccountTeamMapperImpl();
+
+    private final ShiftRepository shiftRepository;
+
+    private final TeamRepository teamRepository;
 
     public Page<HistoryEntryDTO> getHistory(Long idAccount, Pageable pageable) {
         Optional<AccountDTO> accountDTOOptional = this.accountService.getById(idAccount);
@@ -103,6 +120,25 @@ public class HistoryService {
             List<IssueDTO> issueDTOS = this.issueService.allIssueByWorkSessionId(workSessionId);
             if (!issueDTOS.isEmpty()) {
                 entryDTO.setIssueDescription(issueDTOS.stream().map(IssueDTO::getDescription).collect(Collectors.joining(", ")));
+                hasRelevantData = true;
+            }
+
+            // Retrieve and set team and shift data
+            Optional<AccountTeamDTO> accountTeamDTOOptional = this.accountTeamService.findByWorkSessionId(workSessionId);
+
+            if (accountTeamDTOOptional.isPresent()) {
+
+                AccountTeamDTO accountTeamDTO = accountTeamDTOOptional.get();
+                AccountTeam accountTeam = this.accountTeamMapper.fromAccountTeamDTO(accountTeamDTO);
+
+                Optional<Shift> shift = this.shiftRepository.findById(accountTeam.getShift().getIdShift());
+                Optional<Team> team = this.teamRepository.findById(accountTeam.getTeam().getIdTeam());
+
+                if (shift.isPresent() && team.isPresent())
+                {
+                    entryDTO.setTeamName(team.get().getName());
+                    entryDTO.setShiftName(shift.get().getName());
+                }
                 hasRelevantData = true;
             }
 
