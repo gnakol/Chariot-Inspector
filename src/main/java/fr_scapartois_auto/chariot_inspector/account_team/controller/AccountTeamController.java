@@ -31,6 +31,14 @@ public class AccountTeamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.accountTeamService.addOrUpdateAccountTeam(accountTeamDTO));
     }
 
+    @DeleteMapping("remove-account-team-by-id/{idAccountTeam}")
+    public ResponseEntity<String> removeAccountTeam(@Validated @PathVariable Long idAccountTeam)
+    {
+        this.accountTeamService.remove(idAccountTeam);
+
+        return ResponseEntity.ok("Account Team was successfully remove");
+    }
+
     @GetMapping("get-account-team-by-id/{idAccountTeam}")
     public ResponseEntity<AccountTeamDTO> getAccountTeamById(@Validated @PathVariable Long idAccountTeam)
     {

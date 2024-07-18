@@ -58,4 +58,12 @@ public class TeamController {
                     throw  new RuntimeException("Sorry this team was not found");
                 });
     }
+
+    @GetMapping("get-id-team-by-name")
+    public ResponseEntity<Long> getIdTeamByName(@Validated @RequestParam String name)
+    {
+        Long idTeam = this.teamService.getIdTeamByName(name);
+
+        return ResponseEntity.ok(idTeam);
+    }
 }

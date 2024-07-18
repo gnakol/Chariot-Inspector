@@ -62,4 +62,14 @@ public class TeamService implements Webservices<TeamDTO> {
         return this.teamRepository.findById(id)
                 .map(this.teamMapper::fromTeam);
     }
+
+    public Long getIdTeamByName(String name)
+    {
+        Optional<Team> team = this.teamRepository.findByName(name);
+
+        if (team.isEmpty())
+            throw new RuntimeException("Sorry team with name :" +name+ " was not found");
+
+        return team.get().getIdTeam();
+    }
 }

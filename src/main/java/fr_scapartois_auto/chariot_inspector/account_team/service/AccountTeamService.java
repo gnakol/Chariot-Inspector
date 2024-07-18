@@ -80,6 +80,13 @@ public class AccountTeamService implements Webservices<AccountTeamDTO> {
     @Override
     public void remove(Long id) {
 
+        Optional<AccountTeam> accountTeam = this.accountTeamRepository.findById(id);
+
+        if (accountTeam.isEmpty())
+            throw new RuntimeException("this id was not found");
+
+        this.accountTeamRepository.delete(accountTeam.get());
+
     }
 
     @Override
@@ -89,6 +96,7 @@ public class AccountTeamService implements Webservices<AccountTeamDTO> {
     }
 
     public AccountTeamDTO addOrUpdateAccountTeam(AccountTeamDTO e) {
+
         AccountTeam accountTeam = this.accountTeamMapper.fromAccountTeamDTO(e);
 
         Optional<Account> account = this.accountRepository.findById(accountTeam.getAccount().getIdAccount());
@@ -121,7 +129,9 @@ public class AccountTeamService implements Webservices<AccountTeamDTO> {
             }
 
             AccountTeam accountTeamSaved = this.accountTeamRepository.save(accountTeam);
-            return this.accountTeamMapper.fromAccountTeam(accountTeamSaved);
+            AccountTeamDTO savedDTO = this.accountTeamMapper.fromAccountTeam(accountTeamSaved);
+            savedDTO.setShiftId(currentShift.getIdShift()); // Mise à jour de shiftId
+            return savedDTO;
         } else {
             throw new RuntimeException("Account or Team not found");
         }
