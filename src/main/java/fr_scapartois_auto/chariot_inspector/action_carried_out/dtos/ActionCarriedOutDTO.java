@@ -20,6 +20,4 @@ public class ActionCarriedOutDTO {
     private Long issueId;
 
     private Long accountId;
-
-    private String workSessionId;
 }

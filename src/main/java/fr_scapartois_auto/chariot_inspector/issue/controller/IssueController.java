@@ -8,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @RestController
@@ -100,9 +103,20 @@ public class IssueController {
         return ResponseEntity.ok(issueService.allIssuesWithDescription(pageable));
     }
 
-/*    @GetMapping("all-issue-by-team-and-date")
-    public ResponseEntity<Page<IssueDTO>> allIssueByTeamAndDateWork(@Validated @RequestParam String team, @RequestParam LocalDateTime shiftStart, @RequestParam LocalDateTime shiftEnd, Pageable pageable)
+    @GetMapping("all-issue-with-not-action-carried-out")
+    public ResponseEntity<Page<IssueDTO>> allIssueWithNotActionCarriedOut(Pageable pageable)
     {
-        return ResponseEntity.ok(this.issueService.allUnresolvedIssuesByTeamAndShift(team, shiftStart, shiftEnd, pageable));
-    }*/
+        return ResponseEntity.ok(this.issueService.allIssueWithNotActionCarriedOut(pageable));
+    }
+
+    @GetMapping("all-issue-with-not-action-carried-out-by-boss")
+    public ResponseEntity<Page<IssueDTO>> allIssueWithNotActionCarriedOut(@RequestParam Long teamId,
+                                                                          @RequestParam LocalDate startDate,
+                                                                          @RequestParam LocalDate endDate,
+                                                                          Pageable pageable) {
+        LocalTime currentTime = LocalTime.now(); // Get current time
+        Page<IssueDTO> issues = issueService.allIssueWithNotActionCarriedOut(teamId, startDate, endDate, currentTime, pageable);
+        return ResponseEntity.ok(issues);
+    }
+
 }

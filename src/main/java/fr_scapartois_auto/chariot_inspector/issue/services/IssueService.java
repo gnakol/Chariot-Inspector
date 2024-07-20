@@ -19,7 +19,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -174,16 +177,31 @@ public class IssueService implements Webservices<IssueDTO> {
                 .map(issueMapper::fromIssue);
     }
 
-/*    public Page<IssueDTO> allUnresolvedIssuesByTeamAndShift(String team, LocalDateTime shiftStart, LocalDateTime shiftEnd, Pageable pageable)
-    {
-        List<Issue> issues = this.issueRepository.findUnresolvedIssuesByTeamAndShift(team, shiftStart, shiftEnd);
+    @Transactional
+    public Page<IssueDTO> allIssueWithNotActionCarriedOut(Pageable pageable) {
+        Page<Issue> issuesPage = this.issueRepository.findIssuesWithoutActions(pageable);
+        List<IssueDTO> issueDTOS = issuesPage.getContent().stream()
+                .map(this.issueMapper::fromIssue)
+                .collect(Collectors.toList());
 
-        List<IssueDTO> issueDTOS = issues.stream().map(this.issueMapper::fromIssue).collect(Collectors.toList());
+        return new PageImpl<>(issueDTOS, pageable, issuesPage.getTotalElements());
+    }
 
-        int start = Math.min((int) pageable.getOffset(), issueDTOS.size());
-        int end = Math.min((start + pageable.getPageSize()), issueDTOS.size());
+/*    @Transactional
+    public Page<IssueDTO> allIssueWithNotActionCarriedOutByTeamAndDate(Long teamId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
+        Page<Issue> issuesPage = this.issueRepository.findIssuesWithoutActionsByTeamAndDate(teamId, startDate, endDate, pageable);
+        List<IssueDTO> issueDTOS = issuesPage.getContent().stream()
+                .map(this.issueMapper::fromIssue)
+                .collect(Collectors.toList());
 
-        return new  PageImpl<>(issueDTOS.subList(start, end), pageable, issueDTOS.size());
+        return new PageImpl<>(issueDTOS, pageable, issuesPage.getTotalElements());
     }*/
+
+    public Page<IssueDTO> allIssueWithNotActionCarriedOut(Long teamId, LocalDate startDate, LocalDate endDate, LocalTime currentTime, Pageable pageable) {
+        Page<Issue> issues = issueRepository.findIssuesWithoutActionsByTeamAndDateAndTime(teamId, startDate, endDate, currentTime, pageable);
+        return issues.map(issueMapper::fromIssue);
+    }
+
+
 
 }

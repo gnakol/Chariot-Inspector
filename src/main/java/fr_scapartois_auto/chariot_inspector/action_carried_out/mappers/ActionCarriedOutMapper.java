@@ -17,16 +17,4 @@ public interface ActionCarriedOutMapper {
     @Mapping(target = "issue.idIssue", source = "issueId")
     @Mapping(target = "account.idAccount", source = "accountId")
     ActionCarriedOut fromActionCarriedOutDTO(ActionCarriedOutDTO actionCarriedOutDTO);
-
-
-    /*
-    *@Mapper(componentModel = "default", uses = {AccountMapper.class})
-    public interface IssueMapper {
-
-    @Mapping(target = "accountId", source = "account.idAccount")
-    IssueDTO fromIssue(Issue issue);
-
-    @Mapping(target = "account.idAccount", source = "accountId")
-    Issue fromIssueDTO(IssueDTO issueDTO);
-}*/
 }

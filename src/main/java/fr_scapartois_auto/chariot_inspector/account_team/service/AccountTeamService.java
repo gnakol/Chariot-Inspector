@@ -114,19 +114,13 @@ public class AccountTeamService implements Webservices<AccountTeamDTO> {
 
             LocalDate usageDate = e.getStartDate();
 
-            Optional<AccountTeam> accountTeamOpt = accountTeamRepository.findByAccountIdAndCurrentDate(account.get().getIdAccount(), usageDate);
-            if (accountTeamOpt.isPresent()) {
-                accountTeam = accountTeamOpt.get();
-                accountTeam.setShift(currentShift);
-                accountTeam.setWorkSessionId(workSessionId);
-            } else {
-                accountTeam.setStartDate(usageDate);
-                accountTeam.setEndDate(currentShift.getEndTime().isBefore(currentShift.getStartTime()) ? usageDate.plusDays(1) : usageDate);
-                accountTeam.setShift(currentShift);
-                accountTeam.setWorkSessionId(workSessionId);
-                accountTeam.setAccount(account.get());
-                accountTeam.setTeam(team.get());
-            }
+            // Toujours créer un nouvel enregistrement AccountTeam
+            accountTeam.setStartDate(usageDate);
+            accountTeam.setEndDate(currentShift.getEndTime().isBefore(currentShift.getStartTime()) ? usageDate.plusDays(1) : usageDate);
+            accountTeam.setShift(currentShift);
+            accountTeam.setWorkSessionId(workSessionId);
+            accountTeam.setAccount(account.get());
+            accountTeam.setTeam(team.get());
 
             AccountTeam accountTeamSaved = this.accountTeamRepository.save(accountTeam);
             AccountTeamDTO savedDTO = this.accountTeamMapper.fromAccountTeam(accountTeamSaved);

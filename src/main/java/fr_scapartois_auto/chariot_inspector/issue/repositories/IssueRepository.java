@@ -2,6 +2,7 @@ package fr_scapartois_auto.chariot_inspector.issue.repositories;
 
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,22 +40,30 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     @Query("SELECT i FROM Issue i WHERE i.description IS NOT NULL AND i.description <> 'RAS'")
     Page<Issue> findIssuesWithDescription(Pageable pageable);
 
-/*    @Query("SELECT i FROM Issue i JOIN i.account a JOIN a.accountTeams at JOIN at.team t JOIN at.shift s LEFT JOIN ActionCarriedOut ac ON i.idIssue = ac.issue.idIssue WHERE ac.idActionCarriedOut IS NULL AND t.name = :team AND i.createdAt BETWEEN :shiftStart AND :shiftEnd AND at.startDate <= :currentDate AND (at.endDate IS NULL OR at.endDate >= :currentDate)")
-    List<Issue> findUnresolvedIssuesByTeamAndShift(@Param("team") String team, @Param("shiftStart") LocalDateTime shiftStart, @Param("shiftEnd") LocalDateTime shiftEnd, @Param("currentDate") LocalDate currentDate);*/
+    // all issue with not action carried out and not content RAS
+    @Query("SELECT i FROM Issue i LEFT JOIN i.actionCarriedOuts a WHERE a.idActionCarriedOut IS NULL AND i.description != 'RAS'")
+    Page<Issue> findIssuesWithoutActions(Pageable pageable);
 
-/*    @Query("SELECT i FROM Issue i " +
-            "JOIN i.account a " +
-            "JOIN a.accountTeams at " +
-            "JOIN at.team t " +
-            "JOIN at.shift s " +
-            "LEFT JOIN ActionCarriedOut ac ON i.idIssue = ac.issue.idIssue " +
-            "WHERE ac.idActionCarriedOut IS NULL " +
-            "AND t.name = :team " +
-            "AND i.createdAt BETWEEN :shiftStart AND :shiftEnd " +
-            "AND at.startDate <= :shiftStart " +
-            "AND (at.endDate IS NULL OR at.endDate >= :shiftEnd)")
-    List<Issue> findUnresolvedIssuesByTeamAndShift(@Param("team") String team,
-                                                   @Param("shiftStart") LocalDateTime shiftStart,
-                                                   @Param("shiftEnd") LocalDateTime shiftEnd);*/
+    @Query("SELECT i FROM Issue i " +
+            "JOIN AccountTeam at ON i.account.idAccount = at.account.idAccount " +
+            "JOIN Shift s ON at.shift.idShift = s.idShift " +
+            "WHERE at.team.idTeam = :teamId " +
+            "AND at.startDate <= :endDate " +
+            "AND (at.endDate IS NULL OR at.endDate >= :startDate) " +
+            "AND s.startTime <= :currentTime " +
+            "AND s.endTime >= :currentTime " +
+            "AND i.actionCarriedOuts IS EMPTY " +
+            "AND i.description <> 'RAS'")
+    Page<Issue> findIssuesWithoutActionsByTeamAndDateAndTime(@Param("teamId") Long teamId,
+                                                             @Param("startDate") LocalDate startDate,
+                                                             @Param("endDate") LocalDate endDate,
+                                                             @Param("currentTime") LocalTime currentTime,
+                                                             Pageable pageable);
+
+
+
+
+
 
 }
+

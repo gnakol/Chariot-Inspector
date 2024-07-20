@@ -49,13 +49,8 @@ public class ActionCarriedOutService implements Webservices<ActionCarriedOutDTO>
 
         if (issue.isPresent() && account.isPresent())
         {
-            String workSessionId = this.workSessionService.getActiveWorkSession(account.get().getIdAccount())
-                    .orElseThrow(() -> new RuntimeException("No active work session found"))
-                    .getWorkSessionId();
-
             actionCarriedOut.setIssue(issue.get());
             actionCarriedOut.setAccount(account.get());
-            actionCarriedOut.setWorkSessionId(workSessionId);
 
             return this.actionCarriedOutMapper.fromActionCarriedOut(this.actionCarriedOutRepository.save(actionCarriedOut));
         }
@@ -84,8 +79,6 @@ public class ActionCarriedOutService implements Webservices<ActionCarriedOutDTO>
                         Optional<Account> account = this.accountRepository.findById(actionCarriedOutt.getAccount().getIdAccount());
                         actionCarriedOut.setAccount(account.get());
                     }
-
-                    actionCarriedOut.setWorkSessionId(actionCarriedOutt.getWorkSessionId());
 
                     return this.actionCarriedOutRepository.save(actionCarriedOut);
                 })

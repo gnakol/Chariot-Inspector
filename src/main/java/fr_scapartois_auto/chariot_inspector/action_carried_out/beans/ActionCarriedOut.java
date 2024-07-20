@@ -27,14 +27,11 @@ public class ActionCarriedOut {
 
     @ManyToOne
     @JoinColumn(name = "id_issue", nullable = false)
-    @JsonIgnoreProperties({"actionCarriedOuts"})
+    @JsonIgnoreProperties({"actionCarriedOuts", "roles", "password", "issues", "pickups", "taurusUsages"})
     private Issue issue;
 
     @ManyToOne
     @JoinColumn(name = "id_account", nullable = true)
-    @JsonIgnoreProperties({"actionCarriedOuts", "roles", "password", "issues"})
+    @JsonIgnoreProperties({"actionCarriedOuts", "roles", "password", "issues", "pickups", "taurusUsages"})
     private Account account;
-
-    @Column(name = "work_session_id")
-    private String workSessionId;
 }

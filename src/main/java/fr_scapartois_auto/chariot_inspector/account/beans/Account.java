@@ -67,7 +67,7 @@ public class Account implements UserDetails {
     private List<ActionCarriedOut> actionCarriedOuts;
 
     @OneToMany(mappedBy = "account")
-    //@JsonIgnoreProperties({"account", "taurus"})
+    @JsonIgnoreProperties({"account", "taurus"})
     private List<TaurusUsage> taurusUsages;
 
     @OneToMany(mappedBy = "account")
