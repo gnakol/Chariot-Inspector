@@ -15,8 +15,4 @@ public class BatteryDTO {
     private Long idBattery;
     private String refBattery;
     private Long batteryNumber;
-    private Long chargeLevel;
-    private String state;
-
-    private Long idCart;
 }

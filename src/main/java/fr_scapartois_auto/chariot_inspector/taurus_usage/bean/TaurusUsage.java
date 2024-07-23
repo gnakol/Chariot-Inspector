@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -30,7 +30,8 @@ public class TaurusUsage {
     @JoinColumn(name = "id_taurus", nullable = false)
     private Taurus taurus;
 
-    private LocalDate usageDate;
+    @Column(name = "usage_date")
+    private LocalDateTime usageDate;
 
     @Column(name = "work_session_id")
     private String workSessionId;

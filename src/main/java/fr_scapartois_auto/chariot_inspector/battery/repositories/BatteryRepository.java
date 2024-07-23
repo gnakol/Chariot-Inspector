@@ -13,6 +13,4 @@ public interface BatteryRepository extends JpaRepository<Battery, Long> {
 
     Optional<Battery> findByBatteryNumber(Long batteryNumber);
 
-    List<Battery> findBatteryByCart(Cart cart);
-
 }

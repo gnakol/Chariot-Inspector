@@ -89,4 +89,10 @@ public class PickupController {
     {
         return ResponseEntity.ok(this.pickupService.getPickupByAccountId(idAccount, pageable));
     }
+
+    @GetMapping("get-id-pickup-by-cart-number")
+    public ResponseEntity<List<Long>> getIdPickupByCartNumber(@RequestParam String cartNumber) {
+        List<Long> idPickup = pickupService.getIdPickupByCartNumber(cartNumber);
+        return ResponseEntity.ok(idPickup);
+    }
 }

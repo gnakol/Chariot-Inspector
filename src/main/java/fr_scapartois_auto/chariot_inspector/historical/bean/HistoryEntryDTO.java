@@ -5,9 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.java.Log;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -28,7 +27,7 @@ public class HistoryEntryDTO {
 
     private List<BatteryDTO> batteryDTOS;
 
-    private LocalDate usageDate;
+    private LocalDateTime usageDate;
 
     private String teamName;
 

@@ -50,34 +50,11 @@ public class CartService implements Webservices<CartDTO> {
     public CartDTO update(Long id, CartDTO e) {
         return this.cartMapper.fromCart(this.cartRepository.findById(id)
                 .map(cart -> {
-                    if (cart.getCartNumber() != null)
+                    if (e.getCartNumber() != null)
                         cart.setCartNumber(e.getCartNumber());
-                    if (cart.getConditionChassis() != null)
-                        cart.setConditionChassis(e.getConditionChassis());
-                    if (cart.getWheelsTornPlat() != null)
-                        cart.setWheelsTornPlat(e.getWheelsTornPlat());
-                    if (cart.getBatteryCablesSockets() != null)
-                        cart.setBatteryCablesSockets(e.getBatteryCablesSockets());
-                    if (cart.getCleanNonSlipPlatform() != null)
-                        cart.setCleanNonSlipPlatform(e.getCleanNonSlipPlatform());
-                    if (cart.getWindshield() != null)
-                        cart.setWindshield(e.getWindshield());
-                    if (cart.getGasBlockStrap() != null)
-                        cart.setGasBlockStrap(e.getGasBlockStrap());
-                    if (cart.getForwardReverseControl() != null)
-                        cart.setForwardReverseControl(e.getForwardReverseControl());
-                    if (cart.getHonk() != null)
-                        cart.setHonk(e.getHonk());
-                    if (cart.getFunctionalElevationSystem() != null)
-                        cart.setFunctionalElevationSystem(e.getFunctionalElevationSystem());
-                    if (cart.getEmergencyStop() != null)
-                        cart.setEmergencyStop(e.getEmergencyStop());
-                    if (cart.getNoLeak() != null)
-                        cart.setNoLeak(e.getNoLeak());
-                    if (cart.getAntiCrushButton() != null)
-                        cart.setAntiCrushButton(e.getAntiCrushButton());
-                    if (cart.getConditionForks() != null)
-                        cart.setConditionForks(e.getConditionForks());
+
+                    if (e.getBrand() != null)
+                        cart.setBrand(e.getBrand());
 
                     return this.cartRepository.save(cart);
                 })

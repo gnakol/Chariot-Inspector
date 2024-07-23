@@ -9,8 +9,8 @@ import fr_scapartois_auto.chariot_inspector.account_team.dto.AccountTeamDTO;
 import fr_scapartois_auto.chariot_inspector.account_team.mapper.AccountTeamMapper;
 import fr_scapartois_auto.chariot_inspector.account_team.mapper.AccountTeamMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account_team.service.AccountTeamService;
-import fr_scapartois_auto.chariot_inspector.battery.dtos.BatteryDTO;
-import fr_scapartois_auto.chariot_inspector.battery.services.BatteryService;
+import fr_scapartois_auto.chariot_inspector.battery_usage.dto.BatteryUsageDTO;
+import fr_scapartois_auto.chariot_inspector.battery_usage.service.BatteryUsageService;
 import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.services.CartService;
 import fr_scapartois_auto.chariot_inspector.historical.bean.HistoryEntryDTO;
@@ -20,7 +20,6 @@ import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.service.PickupService;
 import fr_scapartois_auto.chariot_inspector.shitf.bean.Shift;
 import fr_scapartois_auto.chariot_inspector.shitf.repository.ShiftRepository;
-import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
 import fr_scapartois_auto.chariot_inspector.team.bean.Team;
@@ -46,7 +45,7 @@ public class HistoryService {
 
     private final PickupService pickupService;
 
-    private final BatteryService batteryService;
+    private final BatteryUsageService batteryUsageService;
 
     private final TaurusService taurusService;
 
@@ -112,8 +111,10 @@ public class HistoryService {
                     hasRelevantData = true;
                 }
 
-                List<BatteryDTO> batteryDTOS = this.batteryService.allBatteryByIdCart(pickupDTO.getCartId());
-                entryDTO.setBatteryDTOS(batteryDTOS);
+                List<BatteryUsageDTO> batteryUsageDTOS = this.batteryUsageService.allBatteryUsageByWorkSessionId(workSessionId);
+                entryDTO.setBatteryDTOS(batteryUsageDTOS.stream()
+                        .map(batteryUsage -> this.batteryUsageService.getBatteryById(batteryUsage.getBatteryId()))
+                        .collect(Collectors.toList()));
             }
 
             // Retrieve and set issues
@@ -134,8 +135,7 @@ public class HistoryService {
                 Optional<Shift> shift = this.shiftRepository.findById(accountTeam.getShift().getIdShift());
                 Optional<Team> team = this.teamRepository.findById(accountTeam.getTeam().getIdTeam());
 
-                if (shift.isPresent() && team.isPresent())
-                {
+                if (shift.isPresent() && team.isPresent()) {
                     entryDTO.setTeamName(team.get().getName());
                     entryDTO.setShiftName(shift.get().getName());
                 }

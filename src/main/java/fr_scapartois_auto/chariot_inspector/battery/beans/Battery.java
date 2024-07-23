@@ -27,16 +27,4 @@ public class Battery {
 
     @Column(name = "battery_number")
     private Long batteryNumber;
-
-    @Column(name = "charge_level")
-    private Long chargeLevel;
-
-    @Column(name = "state")
-    private String state;
-
-    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.REMOVE})
-    @JoinColumn(name = "id_cart")
-    @JsonIgnoreProperties({"batteryList"})
-    @JsonBackReference
-    private Cart cart;
 }

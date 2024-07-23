@@ -8,9 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "default")
 public interface BatteryMapper {
 
-    @Mapping(target = "idCart", source = "cart.idCart")
     BatteryDTO fromBattery(Battery battery);
 
-    @Mapping(target = "cart.idCart", source = "idCart")
     Battery fromBatteryDTO(BatteryDTO batteryDTO);
 }

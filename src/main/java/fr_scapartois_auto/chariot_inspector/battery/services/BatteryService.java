@@ -47,20 +47,7 @@ public class BatteryService implements Webservices<BatteryDTO> {
 
         e.setRefBattery(this.uuidService.generateUuid());
 
-        Battery battery = this.batteryMapper.fromBatteryDTO(e);
-
-        Optional<Cart> cart = this.cartRepository.findById(battery.getCart().getIdCart());
-
-        if (cart.isPresent())
-        {
-            battery.setCart(cart.get());
-
-            Battery savedBattery = this.batteryRepository.save(battery);
-
-            return this.batteryMapper.fromBattery(savedBattery);
-        }
-        else
-            throw new RuntimeException("Cart not found");
+        return this.batteryMapper.fromBattery(this.batteryRepository.save(this.batteryMapper.fromBatteryDTO(e)));
     }
 
 
@@ -70,16 +57,6 @@ public class BatteryService implements Webservices<BatteryDTO> {
                 .map(battery -> {
                     if (e.getBatteryNumber() != null)
                         battery.setBatteryNumber(e.getBatteryNumber());
-                    if (e.getChargeLevel() != null)
-                        battery.setChargeLevel(e.getChargeLevel());
-                    if (e.getState() != null)
-                        battery.setState(e.getState());
-
-                    if (e.getIdCart() != null)
-                    {
-                        Optional<Cart> cart = this.cartRepository.findById(e.getIdCart());
-                        battery.setCart(cart.get());
-                    }
 
                     return this.batteryRepository.save(battery);
                 })
@@ -117,7 +94,7 @@ public class BatteryService implements Webservices<BatteryDTO> {
         return battery.get().getIdBattery();
     }
 
-    public Page<BatteryDTO> allBatteryByCart(Long idCart, Pageable pageable)
+/*    public Page<BatteryDTO> allBatteryByCart(Long idCart, Pageable pageable)
     {
         Optional<Cart> cart = this.cartRepository.findById(idCart);
 
@@ -131,9 +108,9 @@ public class BatteryService implements Webservices<BatteryDTO> {
         int end = Math.min((start + pageable.getPageSize()), batteryDTOS.size());
 
         return new PageImpl<>(batteryDTOS.subList(start, end), pageable, batteryDTOS.size());
-    }
+    }*/
 
-    public List<BatteryDTO> allBatteryByIdCart(Long idCart)
+/*    public List<BatteryDTO> allBatteryByIdCart(Long idCart)
     {
         Optional<Cart> cart = this.cartRepository.findById(idCart);
 
@@ -144,5 +121,5 @@ public class BatteryService implements Webservices<BatteryDTO> {
                 .stream()
                 .map(this.batteryMapper::fromBattery)
                 .collect(Collectors.toList());
-    }
+    }*/
 }

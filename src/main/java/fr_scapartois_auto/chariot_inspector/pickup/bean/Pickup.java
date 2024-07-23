@@ -37,4 +37,43 @@ public class Pickup {
 
     @Column(name = "work_session_id")
     private String workSessionId;
+
+    @Column(name = "condition_chassis")
+    private String conditionChassis;
+
+    @Column(name = "wheels_torn_plat")
+    private String wheelsTornPlat;
+
+    @Column(name = "battery_cables_sockets")
+    private String batteryCablesSockets;
+
+    @Column(name = "clean_non_slip_platform")
+    private String cleanNonSlipPlatform;
+
+    @Column(name = "windshield")
+    private String windshield;
+
+    @Column(name = "gas_block_strap")
+    private String gasBlockStrap;
+
+    @Column(name = "forward_reverse_controls")
+    private String forwardReverseControl;
+
+    @Column(name = "honk")
+    private String honk;
+
+    @Column(name = "functional_elevation_system")
+    private String functionalElevationSystem;
+
+    @Column(name = "emergency_stop")
+    private String emergencyStop;
+
+    @Column(name = "no_leak")
+    private String noLeak;
+
+    @Column(name = "anti_crush_button")
+    private String antiCrushButton;
+
+    @Column(name = "condition_forks")
+    private String conditionForks;
 }

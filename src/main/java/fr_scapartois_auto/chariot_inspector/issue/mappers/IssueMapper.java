@@ -5,8 +5,9 @@ import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
 import fr_scapartois_auto.chariot_inspector.issue.dtos.IssueDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "default", uses = {AccountMapper.class})
+@Mapper(componentModel = "default", uses = {AccountMapper.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface IssueMapper {
 
     @Mapping(target = "accountId", source = "account.idAccount")

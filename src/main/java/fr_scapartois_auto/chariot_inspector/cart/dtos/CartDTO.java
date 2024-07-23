@@ -18,21 +18,6 @@ public class CartDTO {
 
     private Long idCart;
     private String cartNumber;
-    private String conditionChassis;
-    private String wheelsTornPlat;
-    private String batteryCablesSockets;
-    private String cleanNonSlipPlatform;
-    private String windshield;
-    private String gasBlockStrap;
-    private String forwardReverseControl;
-    private String honk;
-    private String functionalElevationSystem;
-    private String emergencyStop;
-    private String noLeak;
-    private String antiCrushButton;
-    private String conditionForks;
 
-    private List<BatteryDTO> batteryDTOS;
-
-    private List<AccompaniedDTO> accompaniedDTOS;
+    private String brand;
 }

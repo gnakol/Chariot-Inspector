@@ -67,9 +67,9 @@ public class BatteryController {
         return ResponseEntity.ok(idBattery);
     }
 
-    @GetMapping("all-battery-by-cart/{idCart}")
+/*    @GetMapping("all-battery-by-cart/{idCart}")
     public ResponseEntity<Page<BatteryDTO>> allBatteryByCart(@Validated @PathVariable Long idCart, Pageable pageable)
     {
         return ResponseEntity.ok(this.batteryService.allBatteryByCart(idCart, pageable));
-    }
+    }*/
 }

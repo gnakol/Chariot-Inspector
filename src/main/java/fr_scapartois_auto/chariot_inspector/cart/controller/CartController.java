@@ -64,7 +64,7 @@ public class CartController {
     }
 
     @GetMapping("get-cart-by-id/{idCart}")
-    public ResponseEntity<CartDTO> getBYIdCart(@Validated @PathVariable Long idCart)
+    public ResponseEntity<CartDTO> getByIdCart(@Validated @PathVariable Long idCart)
     {
         return this.cartService.getById(idCart)
                 .map(cartDTO -> {
@@ -90,11 +90,4 @@ public class CartController {
 
         return ResponseEntity.ok(idCart);
     }
-
-
-
-
-
-
-
 }

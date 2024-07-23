@@ -104,6 +104,45 @@ public class PickupService implements Webservices<PickupDTO> {
                         pickup.setCart(cart.get());
                     }
 
+                    if (e.getConditionChassis() != null)
+                        pickup.setConditionChassis(e.getConditionChassis());
+
+                    if (e.getWheelsTornPlat() != null)
+                        pickup.setWheelsTornPlat(e.getWheelsTornPlat());
+
+                    if (e.getBatteryCablesSockets() != null)
+                        pickup.setBatteryCablesSockets(e.getBatteryCablesSockets());
+
+                    if (e.getCleanNonSlipPlatform() != null)
+                        pickup.setCleanNonSlipPlatform(e.getCleanNonSlipPlatform());
+
+                    if (e.getWindshield() != null)
+                        pickup.setWindshield(e.getWindshield());
+
+                    if (e.getGasBlockStrap() != null)
+                        pickup.setGasBlockStrap(e.getGasBlockStrap());
+
+                    if (e.getForwardReverseControl() != null)
+                        pickup.setForwardReverseControl(e.getForwardReverseControl());
+
+                    if (e.getHonk() != null)
+                        pickup.setHonk(e.getHonk());
+
+                    if (e.getFunctionalElevationSystem() != null)
+                        pickup.setFunctionalElevationSystem(e.getFunctionalElevationSystem());
+
+                    if (e.getEmergencyStop() != null)
+                        pickup.setEmergencyStop(e.getEmergencyStop());
+
+                    if (e.getNoLeak() != null)
+                        pickup.setNoLeak(e.getNoLeak());
+
+                    if (e.getAntiCrushButton() != null)
+                        pickup.setAntiCrushButton(e.getAntiCrushButton());
+
+                    if (e.getConditionForks() != null)
+                        pickup.setConditionForks(e.getConditionForks());
+
                     return this.pickupRepository.save(pickup);
                 })
                 .orElseThrow(() -> new RuntimeException("Account or Cart is not found")));
@@ -191,6 +230,11 @@ public class PickupService implements Webservices<PickupDTO> {
     public List<String> getWorkSessionIdsByAccountId(Long idAccount)
     {
         return this.pickupRepository.findDistinctWorkSessionIdsByAccountId(idAccount);
+    }
+
+    @Transactional
+    public List<Long> getIdPickupByCartNumber(String cartNumber) {
+        return this.pickupRepository.findIdByCartNumber(cartNumber);
     }
 
 
