@@ -95,4 +95,18 @@ public class PickupController {
         List<Long> idPickup = pickupService.getIdPickupByCartNumber(cartNumber);
         return ResponseEntity.ok(idPickup);
     }
+
+    @GetMapping("take-pickup-by-work-session-id")
+    public ResponseEntity<PickupDTO> getPickupByWorkSessionId(@Validated @RequestParam String workSessionId) {
+
+        return this.pickupService.takePickupByWorkSessionId(workSessionId)
+                .map(pickupDTO -> {
+                    log.info("Pickup with work session id : " +workSessionId+ " was found");
+                    return new ResponseEntity<>(pickupDTO, HttpStatus.OK);
+                })
+                .orElseThrow(() -> {
+                    log.error("Pickup with work session id :" +workSessionId+ " was not found");
+                    throw new RuntimeException(" Sorry this pickup by workSessionId was loose");
+                });
+    }
 }

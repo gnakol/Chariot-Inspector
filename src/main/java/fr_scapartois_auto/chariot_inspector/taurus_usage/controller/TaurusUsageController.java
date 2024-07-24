@@ -1,6 +1,7 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.controller;
 
 import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
+import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
 import lombok.RequiredArgsConstructor;
@@ -85,6 +86,20 @@ public class TaurusUsageController {
                 .orElseThrow(() -> {
                     log.error("taurus usage with id : "+taurusId+ " was not found");
                     throw new RuntimeException("not found this id");
+                });
+    }
+
+    @GetMapping("take-taurus-usage-by-work-session-id")
+    public ResponseEntity<TaurusUsageDTO> getTaurusUsageByWorkSessionId(@Validated @RequestParam String workSessionId) {
+
+        return this.taurusUsageService.takeTaurusUsageByWorkSessionId(workSessionId)
+                .map(taurusUsageDTO -> {
+                    log.info("Taurus usage with work session id : " +workSessionId+ " was found");
+                    return new ResponseEntity<>(taurusUsageDTO, HttpStatus.OK);
+                })
+                .orElseThrow(() -> {
+                    log.error("Taurus usage with work session id :" +workSessionId+ " was not found");
+                    throw new RuntimeException(" Sorry this taurus usage by workSessionId was loose");
                 });
     }
 }

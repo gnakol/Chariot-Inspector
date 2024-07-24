@@ -203,6 +203,18 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         return taurusUsage.map(this.taurusUsageMapper::fromTaurusUsage);
     }
 
+    public Optional<TaurusUsageDTO> takeTaurusUsageByWorkSessionId(String workSessionId)
+    {
+        List<TaurusUsage> taurusUsages = this.taurusUsageRepository.findByWorkSessionId(workSessionId);
+
+        if (taurusUsages.isEmpty())
+            throw new RuntimeException("Taurus usage was not found");
+
+        TaurusUsage taurusUsage = taurusUsages.get(0);
+
+        return Optional.of(this.taurusUsageMapper.fromTaurusUsage(taurusUsage));
+    }
+
 
 
 

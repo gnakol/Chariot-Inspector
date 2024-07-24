@@ -39,12 +39,15 @@ public class ActionCarriedOutController {
     }
 
     @DeleteMapping("remove-action-carried-out/{idActionCarriedOut}")
-    public ResponseEntity<String> removeActionCarriedOut(@Validated @PathVariable Long idActionCarriedOut)
-    {
-        this.actionCarriedOutService.remove(idActionCarriedOut);
-
-        return ResponseEntity.status(202).body("Action carried out with id : " +idActionCarriedOut+ " was successfully remove");
+    public ResponseEntity<String> removeActionCarriedOut(@PathVariable Long idActionCarriedOut) {
+        try {
+            actionCarriedOutService.remove(idActionCarriedOut);
+            return ResponseEntity.status(HttpStatus.OK).body("Action carried out removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing action carried out");
+        }
     }
+
 
     @GetMapping("get-action-carried-out-by-id/{idActionCarriedOut}")
     public ResponseEntity<ActionCarriedOutDTO> getActionCarriedOutById(@Validated @PathVariable Long idActionCarriedOut)

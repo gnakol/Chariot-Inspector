@@ -237,5 +237,17 @@ public class PickupService implements Webservices<PickupDTO> {
         return this.pickupRepository.findIdByCartNumber(cartNumber);
     }
 
+    public Optional<PickupDTO> takePickupByWorkSessionId(String workSessionId)
+    {
+        List<Pickup> pickups = this.pickupRepository.findByWorkSessionId(workSessionId);
+
+        if (pickups.isEmpty())
+            throw new RuntimeException("Sorry pickups was not found");
+
+        Pickup pickup = pickups.get(0);
+
+        return Optional.of(this.pickupMapper.fromPickup(pickup));
+    }
+
 
 }
