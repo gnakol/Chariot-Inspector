@@ -2,6 +2,7 @@ package fr_scapartois_auto.chariot_inspector.account.beans;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import fr_scapartois_auto.chariot_inspector.account_service.bean.AccountServiceBean;
 import fr_scapartois_auto.chariot_inspector.action_carried_out.beans.ActionCarriedOut;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
@@ -43,9 +44,6 @@ public class Account implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "service")
-    private String service;
-
     @Column(name = "civility")
     private String civility;
 
@@ -73,6 +71,10 @@ public class Account implements UserDetails {
     @OneToMany(mappedBy = "account")
     @JsonIgnoreProperties({"account", "cart"})
     private List<Pickup> pickups;
+
+    @ManyToOne
+    @JoinColumn(name = "id_service")
+    private AccountServiceBean accountServiceBean;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

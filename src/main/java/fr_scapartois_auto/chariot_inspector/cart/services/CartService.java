@@ -1,14 +1,16 @@
 package fr_scapartois_auto.chariot_inspector.cart.services;
 
-import fr_scapartois_auto.chariot_inspector.account.beans.Account;
-import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
-import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
-import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
+import fr_scapartois_auto.chariot_inspector.cart_category.bean.CartCategory;
+import fr_scapartois_auto.chariot_inspector.cart_category.repositorie.CartCategoryRepository;
+import fr_scapartois_auto.chariot_inspector.fuel_type.bean.FuelType;
+import fr_scapartois_auto.chariot_inspector.fuel_type.repositorie.FuelTypeRepository;
+import fr_scapartois_auto.chariot_inspector.manufacturer.bean.Manufacturer;
+import fr_scapartois_auto.chariot_inspector.manufacturer.repositorie.ManufacturerRepository;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +18,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +29,11 @@ public class CartService implements Webservices<CartDTO> {
 
     private final CartMapper cartMapper = new CartMapperImpl();
 
-    private final UuidService uuidService;
+    private final FuelTypeRepository fuelTypeRepository;
 
-    private final AccountMapper accountMapper = new AccountMapperImpl();
+    private final ManufacturerRepository manufacturerRepository;
+
+    private final CartCategoryRepository cartCategoryRepository;
 
 
     @Override
@@ -43,18 +45,54 @@ public class CartService implements Webservices<CartDTO> {
     @Override
     public CartDTO add(CartDTO e) {
 
-        return this.cartMapper.fromCart(this.cartRepository.save(this.cartMapper.fromCartDTO(e)));
+        Cart cart = this.cartMapper.fromCartDTO(e);
+
+        Optional<Manufacturer> manufacturer = this.manufacturerRepository.findById(cart.getManufacturer().getIdManufacturer());
+        Optional<CartCategory> cartCategory = this.cartCategoryRepository.findById(cart.getCategory().getIdCategory());
+        Optional<FuelType> fuelType = this.fuelTypeRepository.findById(cart.getFuelType().getIdFuelType());
+
+        if (manufacturer.isPresent() && cartCategory.isPresent() && fuelType.isPresent())
+        {
+            cart.setManufacturer(manufacturer.get());
+            cart.setCategory(cartCategory.get());
+            cart.setFuelType(fuelType.get());
+
+            Cart savedCart = this.cartRepository.save(cart);
+
+            return this.cartMapper.fromCart(savedCart);
+        }
+        else
+            throw new RuntimeException("Sorry Fuel-type and Cart-category and Manufacturer was not found");
     }
 
     @Override
     public CartDTO update(Long id, CartDTO e) {
+
+        Cart cartt = this.cartMapper.fromCartDTO(e);
+
         return this.cartMapper.fromCart(this.cartRepository.findById(id)
                 .map(cart -> {
                     if (e.getCartNumber() != null)
                         cart.setCartNumber(e.getCartNumber());
 
-                    if (e.getBrand() != null)
-                        cart.setBrand(e.getBrand());
+                    if (e.getManufacturerId() != null)
+                    {
+                        Optional<Manufacturer> manufacturer = this.manufacturerRepository.findById(cartt.getManufacturer().getIdManufacturer());
+                        cart.setManufacturer(manufacturer.get());
+
+                    }
+
+                    if (e.getCategoryId() != null)
+                    {
+                        Optional<CartCategory> cartCategory = this.cartCategoryRepository.findById(cartt.getCategory().getIdCategory());
+                        cart.setCategory(cartCategory.get());
+                    }
+
+                    if (e.getFuelTypeId() != null)
+                    {
+                        Optional<FuelType> fuelType = this.fuelTypeRepository.findById(cartt.getFuelType().getIdFuelType());
+                        cart.setFuelType(fuelType.get());
+                    }
 
                     return this.cartRepository.save(cart);
                 })

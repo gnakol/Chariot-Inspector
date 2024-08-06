@@ -5,9 +5,8 @@ import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
 import fr_scapartois_auto.chariot_inspector.account.repositories.AccountRepository;
-import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
-import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
-import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
+import fr_scapartois_auto.chariot_inspector.account_service.bean.AccountServiceBean;
+import fr_scapartois_auto.chariot_inspector.account_service.repositorie.AccountServiceRepository;
 import fr_scapartois_auto.chariot_inspector.role.beans.Role;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapper;
 import fr_scapartois_auto.chariot_inspector.role.mappers.RoleMapperImpl;
@@ -46,9 +45,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     private final RoleService roleService;
 
-    private final CartMapper cartMapper = new CartMapperImpl();
-
-    private final CartRepository cartRepository;
+    private final AccountServiceRepository accountServiceRepository;
 
     @Override
     public Page<AccountDTO> all(Pageable pageable) {
@@ -64,6 +61,8 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
     public AccountDTO addNewAccount(AccountDTO accountDTO) {
         // Convertir le DTO en entité Account
         Account account = this.accountMapper.fromAccountDTO(accountDTO);
+
+        Optional<AccountServiceBean> accountServiceBean = this.accountServiceRepository.findById(account.getAccountServiceBean().getIdAccountService());
 
         // Vérifier si des rôles sont fournis
         if (account.getRoles() == null || account.getRoles().isEmpty()) {
@@ -81,6 +80,11 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
             account.setRoles(roles);
         }
 
+        if (accountServiceBean.isPresent())
+            account.setAccountServiceBean(accountServiceBean.get());
+        else
+            throw new RuntimeException("AccountServiceBean was not found");
+
         // Encoder le mot de passe
         account.setPassword(this.bCryptPasswordEncoder.encode(account.getPassword()));
 
@@ -94,6 +98,9 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
     @Override
     public AccountDTO update(Long id, AccountDTO e) {
+
+        Account account = this.accountMapper.fromAccountDTO(e);
+
         if (id == null) {
             throw new IllegalArgumentException("The given id must not be null");
         }
@@ -109,8 +116,11 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                                 a.setEmail(e.getEmail());
                             if (e.getPassword() != null)
                                 a.setPassword(this.bCryptPasswordEncoder.encode(e.getPassword()));
-                            if (e.getService() != null)
-                                a.setService(e.getService());
+                            if (e.getAccountServiceBeanId() != null)
+                            {
+                                Optional<AccountServiceBean> accountServiceBean = this.accountServiceRepository.findById(account.getAccountServiceBean().getIdAccountService());
+                                a.setAccountServiceBean(accountServiceBean.get());
+                            }
                             if (e.getCivility() != null)
                                 a.setCivility(e.getCivility());
 

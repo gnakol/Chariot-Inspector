@@ -11,4 +11,6 @@ public class AccountServiceDTO {
     private Long idAccountService;
 
     private String name;
+
+    private Long wareHouseId;
 }

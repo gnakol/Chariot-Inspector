@@ -45,6 +45,7 @@ public class AccountServiceController {
         return ResponseEntity.status(202).body("Account service bean was successfully remove");
     }
 
+    @GetMapping("get-account-service-bean-by-id/{idAccountServiceBean}")
     public ResponseEntity<AccountServiceDTO> getAccountServiceById(@Validated @PathVariable Long idAccountServiceBean)
     {
         return this.accountServiceBeanService.getById(idAccountServiceBean)
@@ -56,5 +57,11 @@ public class AccountServiceController {
                     log.error("Account service bean with id : " +idAccountServiceBean+ " was not found");
                     throw new RuntimeException(" Sorry this id account service bean not found");
                 });
+    }
+
+    @GetMapping("get-id-service-bean-by-name")
+    public ResponseEntity<Long> getIdAccountServiceBeanByName(@RequestParam String wareHouseName)
+    {
+        return ResponseEntity.ok(this.accountServiceBeanService.getIdWareHouseByName(wareHouseName));
     }
 }

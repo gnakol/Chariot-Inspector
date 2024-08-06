@@ -23,8 +23,6 @@ public class CartDTO {
     private Long idCart;
     private String cartNumber;
 
-    private String brand;
-
     private Long manufacturerId;
 
     private Long categoryId;

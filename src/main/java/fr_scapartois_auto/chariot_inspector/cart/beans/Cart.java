@@ -32,9 +32,6 @@ public class Cart {
     @Column(name = "cart_number")
     private String cartNumber;
 
-    @Column(name = "brand")
-    private String brand;
-
     @ManyToOne
     @JoinColumn(name = "id_manufacturer")
     private Manufacturer manufacturer;

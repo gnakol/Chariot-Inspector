@@ -18,11 +18,17 @@ import java.util.List;
 public class AccountDTO {
 
     private Long idAccount;
+
     private String name;
+
     private String firstName;
+
     private String email;
+
     private String password;
-    private String service;
+
+    private Long accountServiceBeanId;
+
     private String civility;
 
     private List<RoleDTO> roleDTOS;
