@@ -72,7 +72,7 @@ public class Account implements UserDetails {
     @JsonIgnoreProperties({"account", "cart"})
     private List<Pickup> pickups;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "id_service")
     private AccountServiceBean accountServiceBean;
 

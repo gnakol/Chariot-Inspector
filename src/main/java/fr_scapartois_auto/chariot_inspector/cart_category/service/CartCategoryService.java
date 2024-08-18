@@ -61,4 +61,11 @@ public class CartCategoryService implements Webservices<CartCategoryDTO> {
         return this.cartCategoryRepository.findById(id)
                 .map(this.cartCategoryMapper::fromCartCategory);
     }
+
+    public Long getIdCartCategoryByName(String name)
+    {
+        CartCategory cartCategory = this.cartCategoryRepository.findByName(name).get();
+
+        return cartCategory.getIdCategory();
+    }
 }

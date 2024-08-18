@@ -7,6 +7,10 @@ import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapper;
 import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
+import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
+import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapper;
+import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapperImpl;
+import fr_scapartois_auto.chariot_inspector.issue.services.IssueService;
 import fr_scapartois_auto.chariot_inspector.pickup.bean.Pickup;
 import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.mapper.PickupMapper;
@@ -21,8 +25,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,6 +45,10 @@ public class PickupService implements Webservices<PickupDTO> {
 
     private final WorkSessionService workSessionService;
 
+    private final IssueService issueService;
+
+    private final IssueMapper issueMapper = new IssueMapperImpl();
+
 
     @Override
     public Page<PickupDTO> all(Pageable pageable) {
@@ -52,15 +60,13 @@ public class PickupService implements Webservices<PickupDTO> {
     public PickupDTO add(PickupDTO e) {
 
         Pickup pickup = this.pickupMapper.fromPickupDTO(e);
-
         Optional<Account> account = this.accountRepository.findById(pickup.getAccount().getIdAccount());
         Optional<Cart> cart = this.cartRepository.findById(pickup.getCart().getIdCart());
 
-        if (account.isPresent() && cart.isPresent())
-        {
+        if (account.isPresent() && cart.isPresent()) {
             String workSessionId = this.workSessionService.getActiveWorkSession(account.get().getIdAccount())
-                            .orElseThrow(() -> new RuntimeException("No active work session found"))
-                                    .getWorkSessionId();
+                    .orElseThrow(() -> new RuntimeException("No active work session found"))
+                    .getWorkSessionId();
 
             pickup.setAccount(account.get());
             pickup.setCart(cart.get());
@@ -68,13 +74,72 @@ public class PickupService implements Webservices<PickupDTO> {
 
             Pickup savedPickup = this.pickupRepository.save(pickup);
 
+            // Vérifier les champs pour créer des problèmes (issues) si nécessaire
+            checkAndCreateIssues(savedPickup);
+
             return this.pickupMapper.fromPickup(savedPickup);
-        }
-        else
+        } else {
             throw new RuntimeException("Cart or Account not found");
-
-
+        }
     }
+
+    private void checkAndCreateIssues(Pickup pickup) {
+
+        List<String> issueDescriptions = new ArrayList<>();
+
+        if ("MAUVAIS".equals(pickup.getConditionChassis())) {
+            issueDescriptions.add("État du châssis / carter mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getWheelsTornPlat())) {
+            issueDescriptions.add("Roues non déchirées et absence de plat mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getBatteryCablesSockets())) {
+            issueDescriptions.add("Câbles et prises batterie mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getConditionForks())) {
+            issueDescriptions.add("État des fourches mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getCleanNonSlipPlatform())) {
+            issueDescriptions.add("Plateforme propre et anti-dérapante mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getWindshield())) {
+            issueDescriptions.add("Pare-brise mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getGasBlockStrap())) {
+            issueDescriptions.add("Bloc gaz + sangle mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getForwardReverseControl())) {
+            issueDescriptions.add("Commandes de marche avant/arrière mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getHonk())) {
+            issueDescriptions.add("Klaxon mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getFunctionalElevationSystem())) {
+            issueDescriptions.add("Système d'élévation fonctionnel mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getEmergencyStop())) {
+            issueDescriptions.add("Arrêt d'urgence mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getNoLeak())) {
+            issueDescriptions.add("Absence de fuite mauvais");
+        }
+        if ("MAUVAIS".equals(pickup.getAntiCrushButton())) {
+            issueDescriptions.add("Bouton anti écrasement mauvais");
+        }
+
+        // Créer une issue pour chaque problème détecté
+        for (String description : issueDescriptions) {
+            Issue issue = Issue.builder()
+                    .description(description)
+                    .account(pickup.getAccount())
+                    .workSessionId(pickup.getWorkSessionId())
+                    .createdAt(LocalDateTime.now().now())
+                    .build();
+
+            this.issueService.add(this.issueMapper.fromIssue(issue));
+        }
+    }
+
 
     @Override
     public PickupDTO update(Long id, PickupDTO e) {
@@ -247,6 +312,32 @@ public class PickupService implements Webservices<PickupDTO> {
         Pickup pickup = pickups.get(0);
 
         return Optional.of(this.pickupMapper.fromPickup(pickup));
+    }
+
+    public Map<String, Boolean> getRelevantFields(Long cartId) {
+
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new RuntimeException("Cart not found"));
+
+        Map<String, Boolean> relevantFields = new HashMap<>();
+        String category = cart.getCategory().getName();
+        String fuelType = cart.getFuelType().getName();
+
+        relevantFields.put("conditionChassis", true);
+        relevantFields.put("wheelsTornPlat", true);
+        relevantFields.put("batteryCablesSockets", fuelType.equalsIgnoreCase("ELECTRIQUE"));
+        relevantFields.put("conditionForks", true);
+        relevantFields.put("cleanNonSlipPlatform", true);
+        relevantFields.put("windshield", Arrays.asList("1A", "1B", "3", "4", "7").contains(category));
+        relevantFields.put("gasBlockStrap", fuelType.equalsIgnoreCase("GAZ") && category.equals("3"));
+        relevantFields.put("forwardReverseControl", true);
+        relevantFields.put("honk", true);
+        relevantFields.put("functionalElevationSystem", true);
+        relevantFields.put("emergencyStop", true);
+        relevantFields.put("noLeak", true);
+        relevantFields.put("antiCrushButton", true);
+
+        return relevantFields;
     }
 
 

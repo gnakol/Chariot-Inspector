@@ -8,12 +8,15 @@ import fr_scapartois_auto.chariot_inspector.account_service.repositorie.AccountS
 import fr_scapartois_auto.chariot_inspector.ware_house.bean.WareHouse;
 import fr_scapartois_auto.chariot_inspector.ware_house.repositorie.WareHouseRepository;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -98,5 +101,11 @@ public class AccountServiceBeanService implements Webservices<AccountServiceDTO>
             throw new RuntimeException("Account service bean with name : "+wareHouseName+ " was not found");
 
         return accountServiceBean.get().getIdAccountService();
+    }
+
+    @Transactional
+    public Page<AccountServiceDTO> getServicesByWarehouseId(Long warehouseId, Pageable pageable) {
+        Page<AccountServiceBean> services = accountServiceRepository.findByWareHouseId(warehouseId, pageable);
+        return services.map(service -> accountServiceMapper.fromAccountService(service));
     }
 }

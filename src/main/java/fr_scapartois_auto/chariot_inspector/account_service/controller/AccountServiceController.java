@@ -5,6 +5,7 @@ import fr_scapartois_auto.chariot_inspector.account_service.service.AccountServi
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,5 +64,15 @@ public class AccountServiceController {
     public ResponseEntity<Long> getIdAccountServiceBeanByName(@RequestParam String wareHouseName)
     {
         return ResponseEntity.ok(this.accountServiceBeanService.getIdWareHouseByName(wareHouseName));
+    }
+
+    @GetMapping("get-all-services-bean-by-warehouse-id/{warehouseId}")
+    public ResponseEntity<Page<AccountServiceDTO>> getServicesByWarehouseId(
+            @PathVariable Long warehouseId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<AccountServiceDTO> services = accountServiceBeanService.getServicesByWarehouseId(warehouseId, pageable);
+        return ResponseEntity.ok(services);
     }
 }

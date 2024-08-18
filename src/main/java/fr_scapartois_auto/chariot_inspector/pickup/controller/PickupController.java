@@ -13,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -108,5 +109,10 @@ public class PickupController {
                     log.error("Pickup with work session id :" +workSessionId+ " was not found");
                     throw new RuntimeException(" Sorry this pickup by workSessionId was loose");
                 });
+    }
+
+    @GetMapping("relevant-fields/{cartId}")
+    public ResponseEntity<Map<String, Boolean>> getRelevantFields(@Validated @PathVariable Long cartId) {
+        return ResponseEntity.ok(this.pickupService.getRelevantFields(cartId));
     }
 }

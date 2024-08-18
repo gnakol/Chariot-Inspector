@@ -64,7 +64,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
 
         Optional<AccountServiceBean> accountServiceBean = this.accountServiceRepository.findById(account.getAccountServiceBean().getIdAccountService());
 
-        // Vérifier si des rôles sont fournis
+
         if (account.getRoles() == null || account.getRoles().isEmpty()) {
             // Si aucun rôle n'est fourni, utiliser les rôles par défaut
             account.setRoles(this.roleService.getDefaultRoles().stream()
@@ -72,7 +72,7 @@ public class AccountService implements Webservices<AccountDTO>, UserDetailsServi
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
         } else {
-            // Ajouter les rôles fournis
+
             List<Role> roles = account.getRoles().stream()
                     .map(role -> this.roleRepository.findById(role.getIdRole()).orElse(null))
                     .filter(Objects::nonNull)

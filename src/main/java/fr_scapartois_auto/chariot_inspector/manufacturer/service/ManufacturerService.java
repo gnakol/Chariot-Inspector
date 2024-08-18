@@ -62,4 +62,11 @@ public class ManufacturerService implements Webservices<ManufacturerDTO> {
         return this.manufacturerRepository.findById(id)
                 .map(this.manufacturerMapper::fromManufacturer);
     }
+
+    public Long getIdManufacturerByName(String name)
+    {
+        Manufacturer manufacturer = this.manufacturerRepository.findByName(name).get();
+
+        return manufacturer.getIdManufacturer();
+    }
 }

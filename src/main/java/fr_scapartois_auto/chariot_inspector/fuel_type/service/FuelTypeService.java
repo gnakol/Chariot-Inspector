@@ -61,4 +61,11 @@ public class FuelTypeService implements Webservices<FuelTypeDTO> {
         return this.fuelTypeRepository.findById(id)
                 .map(this.fuelTypeMapper::fromFuelType);
     }
+
+    public Long getIdFuelTypeByName(String name)
+    {
+        FuelType fuelType = this.fuelTypeRepository.findByName(name).get();
+
+        return fuelType.getIdFuelType();
+    }
 }

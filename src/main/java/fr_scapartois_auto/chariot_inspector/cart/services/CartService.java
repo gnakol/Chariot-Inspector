@@ -7,6 +7,7 @@ import fr_scapartois_auto.chariot_inspector.cart.mappers.CartMapperImpl;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
 import fr_scapartois_auto.chariot_inspector.cart_category.bean.CartCategory;
 import fr_scapartois_auto.chariot_inspector.cart_category.repositorie.CartCategoryRepository;
+import fr_scapartois_auto.chariot_inspector.exception.other.ResourceNotFoundException;
 import fr_scapartois_auto.chariot_inspector.fuel_type.bean.FuelType;
 import fr_scapartois_auto.chariot_inspector.fuel_type.repositorie.FuelTypeRepository;
 import fr_scapartois_auto.chariot_inspector.manufacturer.bean.Manufacturer;
@@ -18,8 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

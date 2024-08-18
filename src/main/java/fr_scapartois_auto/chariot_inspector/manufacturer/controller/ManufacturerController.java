@@ -58,4 +58,12 @@ public class ManufacturerController {
                     throw new RuntimeException("Sorry this id was lost ");
                 });
     }
+
+    @GetMapping("get-id-manufacturer-by-name")
+    public ResponseEntity<Long> getIdManufacturerByName(@RequestParam String name)
+    {
+        Long idManufacturer = this.manufacturerService.getIdManufacturerByName(name);
+
+        return ResponseEntity.ok(idManufacturer);
+    }
 }

@@ -59,4 +59,12 @@ public class CartCategoryController {
                     throw new RuntimeException(" sorry this id cart category was not found");
                 });
     }
+
+    @GetMapping("get-id-cart-category-by-name")
+    public ResponseEntity<Long> getCartCategoryIdByName(@RequestParam String name)
+    {
+        Long idCartCategory = this.cartCategoryService.getIdCartCategoryByName(name);
+
+        return ResponseEntity.ok(idCartCategory);
+    }
 }

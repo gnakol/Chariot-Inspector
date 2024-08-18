@@ -58,4 +58,12 @@ public class FuelTypeController {
                     throw  new RuntimeException("sorry id fuel type was not found");
                 });
     }
+
+    @GetMapping("get-fuel-type-id-by-name")
+    public ResponseEntity<Long> getFuelTypeIdByName(@RequestParam String name)
+    {
+        Long idFuelType = this.fuelTypeService.getIdFuelTypeByName(name);
+
+        return ResponseEntity.ok(idFuelType);
+    }
 }
