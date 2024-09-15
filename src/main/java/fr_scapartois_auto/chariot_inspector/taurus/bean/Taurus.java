@@ -1,4 +1,4 @@
-package fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean;
+package fr_scapartois_auto.chariot_inspector.taurus.bean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.bean.TaurusUsage;

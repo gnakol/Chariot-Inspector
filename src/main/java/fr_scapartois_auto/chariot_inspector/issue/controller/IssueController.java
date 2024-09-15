@@ -119,4 +119,10 @@ public class IssueController {
         return ResponseEntity.ok(issues);
     }
 
+    @GetMapping("issues-by-work-session/{workSessionId}")
+    public ResponseEntity<List<IssueDTO>> getIssuesByWorkSession(@PathVariable String workSessionId) {
+        return ResponseEntity.ok(this.issueService.getIssuesByWorkSessionId(workSessionId));
+    }
+
+
 }

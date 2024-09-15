@@ -1,7 +1,7 @@
 package fr_scapartois_auto.chariot_inspector.historical.service;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.service.TaurusService;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.service.TaurusService;
 import fr_scapartois_auto.chariot_inspector.account.dtos.AccountDTO;
 import fr_scapartois_auto.chariot_inspector.account.services.AccountService;
 import fr_scapartois_auto.chariot_inspector.account_team.bean.AccountTeam;

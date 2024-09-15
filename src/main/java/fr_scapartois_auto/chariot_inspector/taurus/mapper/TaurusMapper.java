@@ -1,8 +1,7 @@
-package fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper;
+package fr_scapartois_auto.chariot_inspector.taurus.mapper;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean.Taurus;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.bean.Taurus;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.mapper.TaurusUsageMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

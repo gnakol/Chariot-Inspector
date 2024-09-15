@@ -8,6 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface AuditRepository extends JpaRepository<Audit, Long> {
-
-    Optional<Audit> findByNameAudit(String name);
 }

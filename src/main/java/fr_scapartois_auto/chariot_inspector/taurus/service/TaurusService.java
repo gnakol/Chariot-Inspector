@@ -1,10 +1,10 @@
-package fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.service;
+package fr_scapartois_auto.chariot_inspector.taurus.service;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean.Taurus;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapper;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapperImpl;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.repositorie.TaurusRepository;
+import fr_scapartois_auto.chariot_inspector.taurus.bean.Taurus;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.mapper.TaurusMapper;
+import fr_scapartois_auto.chariot_inspector.taurus.mapper.TaurusMapperImpl;
+import fr_scapartois_auto.chariot_inspector.taurus.repositorie.TaurusRepository;
 import fr_scapartois_auto.chariot_inspector.uuid.services.UuidService;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
 import lombok.RequiredArgsConstructor;

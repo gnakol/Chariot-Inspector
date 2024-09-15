@@ -84,61 +84,60 @@ public class PickupService implements Webservices<PickupDTO> {
     }
 
     private void checkAndCreateIssues(Pickup pickup) {
-
-        List<String> issueDescriptions = new ArrayList<>();
+        StringBuilder issueDescription = new StringBuilder();
 
         if ("MAUVAIS".equals(pickup.getConditionChassis())) {
-            issueDescriptions.add("État du châssis / carter mauvais");
+            issueDescription.append("État du châssis / carter mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getWheelsTornPlat())) {
-            issueDescriptions.add("Roues non déchirées et absence de plat mauvais");
+            issueDescription.append("Roues non déchirées et absence de plat mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getBatteryCablesSockets())) {
-            issueDescriptions.add("Câbles et prises batterie mauvais");
+            issueDescription.append("Câbles et prises batterie mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getConditionForks())) {
-            issueDescriptions.add("État des fourches mauvais");
+            issueDescription.append("État des fourches mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getCleanNonSlipPlatform())) {
-            issueDescriptions.add("Plateforme propre et anti-dérapante mauvais");
+            issueDescription.append("Plateforme propre et anti-dérapante mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getWindshield())) {
-            issueDescriptions.add("Pare-brise mauvais");
+            issueDescription.append("Pare-brise mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getGasBlockStrap())) {
-            issueDescriptions.add("Bloc gaz + sangle mauvais");
+            issueDescription.append("Bloc gaz + sangle mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getForwardReverseControl())) {
-            issueDescriptions.add("Commandes de marche avant/arrière mauvais");
+            issueDescription.append("Commandes de marche avant/arrière mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getHonk())) {
-            issueDescriptions.add("Klaxon mauvais");
+            issueDescription.append("Klaxon mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getFunctionalElevationSystem())) {
-            issueDescriptions.add("Système d'élévation fonctionnel mauvais");
+            issueDescription.append("Système d'élévation fonctionnel mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getEmergencyStop())) {
-            issueDescriptions.add("Arrêt d'urgence mauvais");
+            issueDescription.append("Arrêt d'urgence mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getNoLeak())) {
-            issueDescriptions.add("Absence de fuite mauvais");
+            issueDescription.append("Absence de fuite mauvais; ");
         }
         if ("MAUVAIS".equals(pickup.getAntiCrushButton())) {
-            issueDescriptions.add("Bouton anti écrasement mauvais");
+            issueDescription.append("Bouton anti écrasement mauvais; ");
         }
 
-        // Créer une issue pour chaque problème détecté
-        for (String description : issueDescriptions) {
+        if (issueDescription.length() > 0) {
             Issue issue = Issue.builder()
-                    .description(description)
+                    .description(issueDescription.toString().trim())
                     .account(pickup.getAccount())
                     .workSessionId(pickup.getWorkSessionId())
-                    .createdAt(LocalDateTime.now().now())
+                    .createdAt(LocalDateTime.now())
                     .build();
 
             this.issueService.add(this.issueMapper.fromIssue(issue));
         }
     }
+
 
 
     @Override
@@ -338,6 +337,25 @@ public class PickupService implements Webservices<PickupDTO> {
         relevantFields.put("antiCrushButton", true);
 
         return relevantFields;
+    }
+
+    public List<Pickup> filterPickups(String search) {
+        if (search == null || search.isEmpty()) {
+            return pickupRepository.findAll();
+        }
+
+        return pickupRepository.findAll().stream()
+                .filter(pickup -> {
+                    String accountFirstName = this.accountRepository.findById(pickup.getAccount().getIdAccount())
+                            .map(Account::getFirstName).orElse("").toLowerCase();
+                    String cartNumber = cartRepository.findById(pickup.getCart().getIdCart())
+                            .map(Cart::getCartNumber).orElse("").toLowerCase();
+                    String workSessionIdSuffix = pickup.getWorkSessionId().substring(pickup.getWorkSessionId().length() - 4).toLowerCase();
+                    return accountFirstName.contains(search.toLowerCase()) ||
+                            cartNumber.contains(search.toLowerCase()) ||
+                            workSessionIdSuffix.contains(search.toLowerCase());
+                })
+                .collect(Collectors.toList());
     }
 
 

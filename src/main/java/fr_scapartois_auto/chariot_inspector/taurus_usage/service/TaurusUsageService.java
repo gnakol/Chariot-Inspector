@@ -1,10 +1,9 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.service;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean.Taurus;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapper;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.mapper.TaurusMapperImpl;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.repositorie.TaurusRepository;
+import fr_scapartois_auto.chariot_inspector.taurus.bean.Taurus;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.mapper.TaurusMapper;
+import fr_scapartois_auto.chariot_inspector.taurus.repositorie.TaurusRepository;
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapper;
 import fr_scapartois_auto.chariot_inspector.account.mappers.AccountMapperImpl;
@@ -23,7 +22,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,7 +38,7 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
 
     private final AccountMapper accountMapper = new AccountMapperImpl();
 
-    private final TaurusMapper taurusMapper = new TaurusMapperImpl();
+    //private final TaurusMapper taurusMapper = new TaurusMapperImpl();
 
     private final TaurusUsageMapper taurusUsageMapper = new TaurusUsageMapperImpl();
 
@@ -145,7 +143,7 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
 
     public Page<TaurusDTO> allTaurusByAccount(Long idAccount, Pageable pageable) {
 
-        Optional<Account> account = this.accountRepository.findById(idAccount);
+/*        Optional<Account> account = this.accountRepository.findById(idAccount);
 
         if (account.isEmpty())
             throw new RuntimeException("Account with id : " + idAccount + " was not found");
@@ -157,7 +155,8 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         int start = Math.min((int) pageable.getOffset(), taurusDTOList.size());
         int end = Math.min((start + pageable.getPageSize()), taurusDTOList.size());
 
-        return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());
+        return new PageImpl<>(taurusDTOList.subList(start, end), pageable, taurusDTOList.size());*/
+        return  null;
     }
 
     public Page<TaurusUsageDTO> getTaurusUsageByAccountId(Long idAccount, Pageable pageable) {
@@ -213,6 +212,24 @@ public class TaurusUsageService implements Webservices<TaurusUsageDTO> {
         TaurusUsage taurusUsage = taurusUsages.get(0);
 
         return Optional.of(this.taurusUsageMapper.fromTaurusUsage(taurusUsage));
+    }
+
+    public Page<TaurusUsageDTO> searchTaurusUsages(String query, Pageable pageable) {
+        List<TaurusUsage> filteredUsages = taurusUsageRepository.findAll().stream()
+                .filter(taurusUsage ->
+                        taurusUsage.getAccount().getFirstName().toLowerCase().contains(query.toLowerCase()) ||
+                                String.valueOf(taurusUsage.getTaurus().getTaurusNumber()).contains(query) ||
+                                taurusUsage.getWorkSessionId().substring(taurusUsage.getWorkSessionId().length() - 4).contains(query)
+                )
+                .collect(Collectors.toList());
+
+        int start = Math.min((int) pageable.getOffset(), filteredUsages.size());
+        int end = Math.min((start + pageable.getPageSize()), filteredUsages.size());
+        List<TaurusUsageDTO> paginatedList = filteredUsages.subList(start, end).stream()
+                .map(taurusUsageMapper::fromTaurusUsage)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(paginatedList, pageable, filteredUsages.size());
     }
 
 

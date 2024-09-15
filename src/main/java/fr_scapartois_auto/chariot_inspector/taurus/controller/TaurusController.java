@@ -1,7 +1,7 @@
-package fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.controller;
+package fr_scapartois_auto.chariot_inspector.taurus.controller;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.service.TaurusService;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.service.TaurusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

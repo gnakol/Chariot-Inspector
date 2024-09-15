@@ -12,6 +12,11 @@ import fr_scapartois_auto.chariot_inspector.battery_usage.mapper.BatteryUsageMap
 import fr_scapartois_auto.chariot_inspector.battery_usage.repositorie.BatteryUsageRepository;
 import fr_scapartois_auto.chariot_inspector.cart.beans.Cart;
 import fr_scapartois_auto.chariot_inspector.cart.repositories.CartRepository;
+import fr_scapartois_auto.chariot_inspector.issue.beans.Issue;
+import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapper;
+import fr_scapartois_auto.chariot_inspector.issue.mappers.IssueMapperImpl;
+import fr_scapartois_auto.chariot_inspector.issue.repositories.IssueRepository;
+import fr_scapartois_auto.chariot_inspector.issue.services.IssueService;
 import fr_scapartois_auto.chariot_inspector.pickup.bean.Pickup;
 import fr_scapartois_auto.chariot_inspector.pickup.repositorie.PickupRepository;
 import fr_scapartois_auto.chariot_inspector.webservices.Webservices;
@@ -21,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +47,12 @@ public class BatteryUsageService implements Webservices<BatteryUsageDTO> {
     private final PickupRepository pickupRepository;
 
     private final BatteryMapper batteryMapper = new BatteryMapperImpl();
+
+    private final IssueService issueService;
+
+    private final IssueMapper issueMapper = new IssueMapperImpl();
+
+    private final IssueRepository issueRepository;
 
     @Override
     public Page<BatteryUsageDTO> all(Pageable pageable) {
@@ -65,12 +77,51 @@ public class BatteryUsageService implements Webservices<BatteryUsageDTO> {
             batteryUsage.setBattery(battery.get());
 
             BatteryUsage savedBatteryUsage = this.batteryUsageRepository.save(batteryUsage);
+
+            this.checkAndCreateIssues(savedBatteryUsage);
+
             return this.batteryUsageMapper.fromBatteryUsage(savedBatteryUsage);
 
         }else {
             throw new RuntimeException("Cart or Battery not found");
         }
     }
+
+    private void checkAndCreateIssues(BatteryUsage batteryUsage) {
+        if ("MAUVAIS".equalsIgnoreCase(batteryUsage.getState())) {
+            Optional<Pickup> latestPickup = this.pickupRepository.findByCart(batteryUsage.getCart()).stream()
+                    .max(Comparator.comparing(Pickup::getPickupDateTime));
+
+            if (latestPickup.isPresent()) {
+                String description = "La batterie est dans un état : 'MAUVAIS': " + batteryUsage.getCart().getIdCart();
+
+                // Rechercher les issues existantes pour cette session de travail
+                List<Issue> existingIssues = this.issueRepository.findByWorkSessionId(batteryUsage.getWorkSessionId());
+                Issue issue;
+
+                if (!existingIssues.isEmpty()) {
+                    // S'il existe déjà une issue, on concatène la description
+                    issue = existingIssues.get(0);
+                    issue.setDescription(issue.getDescription() + " " + description);
+                } else {
+                    // Sinon, on crée une nouvelle issue
+                    issue = Issue.builder()
+                            .description(description)
+                            .account(latestPickup.get().getAccount())
+                            .workSessionId(batteryUsage.getWorkSessionId())
+                            .createdAt(LocalDateTime.now())
+                            .build();
+                }
+
+                this.issueService.add(this.issueMapper.fromIssue(issue));
+            } else {
+                throw new RuntimeException("No Pickup found for the cart associated with this Battery Usage.");
+            }
+        }
+    }
+
+
+
 
     @Override
     public BatteryUsageDTO update(Long id, BatteryUsageDTO e) {

@@ -1,7 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.controller;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto.TaurusDTO;
-import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
+import fr_scapartois_auto.chariot_inspector.taurus.dto.TaurusDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import fr_scapartois_auto.chariot_inspector.taurus_usage.service.TaurusUsageService;
 import lombok.RequiredArgsConstructor;
@@ -102,4 +101,11 @@ public class TaurusUsageController {
                     throw new RuntimeException(" Sorry this taurus usage by workSessionId was loose");
                 });
     }
+
+    @GetMapping("all-taurus-usage-by-filter")
+    public ResponseEntity<Page<TaurusUsageDTO>> searchTaurusUsages(@RequestParam String query, Pageable pageable) {
+
+        return ResponseEntity.ok(taurusUsageService.searchTaurusUsages(query, pageable));
+    }
+
 }

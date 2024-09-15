@@ -1,6 +1,6 @@
 package fr_scapartois_auto.chariot_inspector.taurus_usage.bean;
 
-import fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.bean.Taurus;
+import fr_scapartois_auto.chariot_inspector.taurus.bean.Taurus;
 import fr_scapartois_auto.chariot_inspector.account.beans.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,6 +1,7 @@
 package fr_scapartois_auto.chariot_inspector.pickup.controller;
 
 import fr_scapartois_auto.chariot_inspector.cart.dtos.CartDTO;
+import fr_scapartois_auto.chariot_inspector.pickup.bean.Pickup;
 import fr_scapartois_auto.chariot_inspector.pickup.dto.PickupDTO;
 import fr_scapartois_auto.chariot_inspector.pickup.service.PickupService;
 import lombok.RequiredArgsConstructor;
@@ -114,5 +115,12 @@ public class PickupController {
     @GetMapping("relevant-fields/{cartId}")
     public ResponseEntity<Map<String, Boolean>> getRelevantFields(@Validated @PathVariable Long cartId) {
         return ResponseEntity.ok(this.pickupService.getRelevantFields(cartId));
+    }
+
+    @GetMapping("/all-pickup-filter")
+    public ResponseEntity<List<Pickup>> filterPickups(
+            @RequestParam(value = "search", required = false) String search) {
+        List<Pickup> filteredPickups = pickupService.filterPickups(search);
+        return ResponseEntity.ok(filteredPickups);
     }
 }

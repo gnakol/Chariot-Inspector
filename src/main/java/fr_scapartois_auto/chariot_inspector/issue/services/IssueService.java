@@ -170,6 +170,14 @@ public class IssueService implements Webservices<IssueDTO> {
         return issues.get(0).getIdIssue();
     }
 
+    public List<IssueDTO> getIssuesByWorkSessionId(String workSessionId) {
+        return this.issueRepository.findByWorkSessionId(workSessionId)
+                .stream()
+                .map(issueMapper::fromIssue)
+                .collect(Collectors.toList());
+    }
+
+
 
     @Transactional
     public Page<IssueDTO> allIssuesWithDescription(Pageable pageable) {

@@ -1,4 +1,4 @@
-package fr_scapartois_auto.chariot_inspector.accompanied.beans.taurus.dto;
+package fr_scapartois_auto.chariot_inspector.taurus.dto;
 
 import fr_scapartois_auto.chariot_inspector.taurus_usage.dto.TaurusUsageDTO;
 import lombok.Builder;
