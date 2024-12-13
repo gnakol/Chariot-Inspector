@@ -58,5 +58,21 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @PostMapping(path = "refresh-token", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, String> refreshToken(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            System.out.println("Refreshing token for request: " + token);
+
+            return tokenService.refreshToken(token);
+        }
+
+        throw new RuntimeException("No valid token provided for refresh");
+    }
+
+
+
 
 }

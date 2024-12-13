@@ -5,6 +5,7 @@ import fr_scapartois_auto.chariot_inspector.account.services.AccountService;
 import fr_scapartois_auto.chariot_inspector.token.beans.Token;
 import fr_scapartois_auto.chariot_inspector.token.repositories.TokenRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -12,7 +13,9 @@ import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Key;
 import java.util.Date;
@@ -37,11 +40,14 @@ public class TokenService {
 
     private Map<String, String> generateJwt(Account account) {
         final long currentTime = System.currentTimeMillis();
-        final long expirationTime = currentTime + 60 * 60 * 1000;
+        final long expirationTime = currentTime + 3 * 60 * 1000;
+
+        System.out.println("*******************Generating token for account: " + account.getEmail());
+        System.out.println("*******************Token expiration time: " + new Date(expirationTime));
 
         final Map<String, Object> claims = Map.of(
                 "name", account.getName(),
-                "roles", account.getRoles(), // Assurez-vous que Account a une méthode getRoles() qui retourne les rôles de l'utilisateur
+                "roles", account.getRoles(),
                 Claims.EXPIRATION, new Date(expirationTime),
                 Claims.SUBJECT, account.getEmail()
         );
@@ -60,7 +66,7 @@ public class TokenService {
                 .expirationToken(false)
                 .account(account)
                 .build();
-
+        System.out.println("Saving new token: " + bearer);
         this.tokenRepository.save(tokenBean);
         return Map.of("bearer", bearer);
     }
@@ -74,6 +80,7 @@ public class TokenService {
     private Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(this.getKey())
+                .setAllowedClockSkewSeconds(60)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -135,22 +142,60 @@ public class TokenService {
 
     }
 
+    public boolean isTokenExpiringSoon(String token) {
+        Date expirationDate = getExpirationDateFromToken(token);
+        // Vérifier si le token expire dans les 2 minutes (120000ms)
+        long currentTime = System.currentTimeMillis();
+        return expirationDate.getTime() - currentTime <= 2 * 60 * 1000;  // 2 minutes avant expiration
+    }
+
+
     public boolean validateToken(String token) {
         try {
             if (isTokenExpired(token)) {
-                return false;
+                System.out.println("Token is expired.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token has expired");
             }
 
             if (isTokenDisabled(token)) {
-                return false;
+                System.out.println("Token is disabled.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token is disabled");
             }
 
+            System.out.println("Token is valid.");
             return true;
         } catch (Exception e) {
-            return false;
+            System.out.println("Token validation failed: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token");
         }
     }
 
+
+
+
+
+    public Map<String, String> refreshToken(String token) {
+        try {
+            // Essayer d'extraire l'utilisateur même si le token est expiré
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(this.getKey())
+                    .setAllowedClockSkewSeconds(60) // Tolérer une petite dérive
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            String username = claims.getSubject();
+            Account account = (Account) accountService.loadUserByUsername(username);
+
+            // Générer un nouveau token
+            return generateJwt(account);
+        } catch (ExpiredJwtException e) {
+            // Si le token est expiré, on ne déclenche pas d'exception supplémentaire
+            throw new RuntimeException("Token expired, cannot refresh");
+        } catch (Exception e) {
+            throw new RuntimeException("Token invalid or expired, cannot refresh", e);
+        }
+    }
 
 
 

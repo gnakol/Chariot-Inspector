@@ -32,7 +32,7 @@ public class ConfigurationSecurityApplication {
     private final TokenFilter tokenFilter;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
@@ -41,13 +41,18 @@ public class ConfigurationSecurityApplication {
                         .requestMatchers(POST,"/connexion").permitAll()
                         .requestMatchers(POST, "/forgot-password").permitAll()
                         .requestMatchers(POST, "/reset-password").permitAll()
+                        .requestMatchers(POST, "/refresh-token").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)  // Utilise cet entry point pour les erreurs
+                .and()
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {

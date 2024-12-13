@@ -29,9 +29,9 @@ public class TokenFilter extends OncePerRequestFilter {
         String path = request.getRequestURI().substring(request.getContextPath().length());
 
         // Liste des endpoints qui ne nécessitent pas de vérification de token
-        List<String> skipPaths = List.of("/connexion", "/add-new-account", "/activation", "/reset-password", "/forgot-password");
+        List<String> skipPaths = List.of("/connexion", "/add-new-account", "/activation", "/reset-password", "/forgot-password", "/refresh-token");
 
-        if (skipPaths.stream().anyMatch(path::startsWith)) {
+        if (skipPaths.stream().anyMatch(path::startsWith) || path.contains("/refresh-token")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -47,7 +47,7 @@ public class TokenFilter extends OncePerRequestFilter {
         // Bearer eyJhbGciOiJIUzI1NiJ9.eyJub20iOiJBY2hpbGxlIE1CT1VHVUVORyIsImVtYWlsIjoiYWNoaWxsZS5tYm91Z3VlbmdAY2hpbGxvLnRlY2gifQ.zDuRKmkonHdUez-CLWKIk5Jdq9vFSUgxtgdU1H2216U
         final String authorization = request.getHeader("Authorization");
 
-        System.out.println("token complet : " +authorization);
+        //System.out.println("token complet : " +authorization);
         if(authorization != null && authorization.startsWith("Bearer ")){
 
             token = authorization.substring(7);
@@ -63,11 +63,21 @@ public class TokenFilter extends OncePerRequestFilter {
             UserDetails userDetails = accountService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-        } else if (isTokenDisabled) {
+        } else
+        {
+            if (isTokenExpired) { // Permet d'accéder à refresh-token même avec un token expiré
+                System.out.println("Sending 401 Unauthorized due to expired token.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token has expired");
+                return;
+            }
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token is disable or invalid");
-            return;
+            if (isTokenDisabled) {
+                System.out.println("Sending 401 Unauthorized due to disabled token.");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is disable or invalid");
+                return;
+            }
 
         }
 
